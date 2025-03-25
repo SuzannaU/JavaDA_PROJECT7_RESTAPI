@@ -1,15 +1,19 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
+//import javax.persistence.*;
 //import javax.validation.constraints.NotBlank;
-import java.sql.Timestamp;
+//import java.sql.Timestamp;
 
 @Entity
 @Table(name = "rulename")
 public class RuleName {
+    // TODO: Map columns in data table RULENAME with corresponding java fields
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
+
     private String name;
     private String description;
     private String json;
@@ -26,47 +30,15 @@ public class RuleName {
         this.sqlPart = sqlPart;
     }
 
-    // TODO: Map columns in data table RULENAME with corresponding java fields
-
-
-    public String getSqlPart() {
-        return sqlPart;
+    public RuleName() {
     }
 
-    public void setSqlPart(String sqlPart) {
-        this.sqlPart = sqlPart;
+    public Integer getId() {
+        return id;
     }
 
-    public String getSqlStr() {
-        return sqlStr;
-    }
-
-    public void setSqlStr(String sqlStr) {
-        this.sqlStr = sqlStr;
-    }
-
-    public String getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -77,11 +49,43 @@ public class RuleName {
         this.name = name;
     }
 
-    public Integer getId() {
-        return id;
+    public String getDescription() {
+        return description;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getJson() {
+        return json;
+    }
+
+    public void setJson(String json) {
+        this.json = json;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
+    public String getSqlStr() {
+        return sqlStr;
+    }
+
+    public void setSqlStr(String sqlStr) {
+        this.sqlStr = sqlStr;
+    }
+
+    public String getSqlPart() {
+        return sqlPart;
+    }
+
+    public void setSqlPart(String sqlPart) {
+        this.sqlPart = sqlPart;
     }
 }

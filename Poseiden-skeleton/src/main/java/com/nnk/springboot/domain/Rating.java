@@ -1,16 +1,21 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
+
+//import javax.persistence.*;
 //import javax.validation.constraints.NotBlank;
 //import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+//import java.sql.Timestamp;
 
 @Entity
 @Table(name = "rating")
 public class Rating {
+    // TODO: Map columns in data table RATING with corresponding java fields
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
+
     private String moodysRating;
     private String sandRating;
     private String fitchRating;
@@ -22,8 +27,9 @@ public class Rating {
         this.fitchRating = fitchRating;
         this.orderNumber = orderNumber;
     }
-    // TODO: Map columns in data table RATING with corresponding java fields
 
+    public Rating() {
+    }
 
     public Integer getId() {
         return id;
