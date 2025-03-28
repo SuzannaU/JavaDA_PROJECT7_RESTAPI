@@ -1,21 +1,14 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
-
-//import org.hibernate.validator.constraints.Length;
-//
-//import javax.persistence.*;
-//import javax.validation.constraints.NotBlank;
-//import javax.validation.constraints.NotNull;
-//import java.sql.Timestamp;
 
 
 @Entity
 @Table(name = "curvepoint")
 public class CurvePoint {
-    // TODO: Map columns in data table CURVEPOINT with corresponding java fields
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +21,11 @@ public class CurvePoint {
 
     @Column(name="asOfDate")
     private Timestamp asOfDate;
+
+    @DecimalMin(value = "1.0", message = "Term must be at least 1.0")
     private double term;
+
+    @DecimalMin(value = "1.0", message = "Value must be at least 1.0")
     private double value;
 
     @Column(name="creationDate")
