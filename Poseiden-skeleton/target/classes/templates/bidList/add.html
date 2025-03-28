@@ -8,15 +8,16 @@
 </head>
 <body>
 <div class="container">
-	<p>Utilisateur : <span th:text="${#authentication.name}"></span>
-		| Rôle(s) : <span th:text="${#authentication.authorities}"></span></p>
 
 	<div class="row">
 		<h2>Add New Bid</h2>
 	</div>
 
 	<div class="row">
-		<form action="#" th:action="@{/bidList/validate}" th:object="${bidList}" method="post" class="form-horizontal" style="width: 100%">
+		<form action="#"
+			  th:action="@{/bidList/validate}"
+			  th:object="${bidList}"
+			  method="post" class="form-horizontal" style="width: 100%">
 			<div class="form-group">
 				<label for="account" class="col-sm-2 control-label">Account</label>
 				<div class="col-sm-10">
@@ -34,7 +35,8 @@
 			<div class="form-group">
 				<label for="bidQuantity" class="col-sm-2 control-label">Bid Quantity</label>
 				<div class="col-sm-10">
-					<input type="number" th:field="*{bidQuantity}" id="bidQuantity" placeholder="Bid Quantity" class="col-4">
+					<input type="number" id="bidQuantity" placeholder="Bid Quantity" class="col-4" step="0.1"
+						   th:field="*{bidQuantity}" >
 					<p class="text-danger" th:if="${#fields.hasErrors('bidQuantity')}" th:errors="*{bidQuantity}"></p>
 				</div>
 			</div>

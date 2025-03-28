@@ -1,24 +1,17 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 
 import java.sql.Timestamp;
 
-//import org.springframework.beans.factory.annotation.Required;
-//import javax.validation.constraints.Digits;
-//import javax.validation.constraints.NotBlank;
-//import java.sql.Date;
-//import java.sql.Timestamp;
-
 @Entity
 @Table(name = "bidlist")
 public class BidList {
-    // TODO: Map columns in data table BIDLIST with corresponding java fields
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="BidListId")
     private Integer bidListId;
 
@@ -30,7 +23,7 @@ public class BidList {
     @Column(name="type")
     private String type;
 
-    //@Digits(message = "message", integer = 10, fraction = 1)
+    @DecimalMin(value = "1.0", message = "Bid Quantity must be at least 1.0")
     @Column(name="bidQuantity")
     private double bidQuantity;
 
