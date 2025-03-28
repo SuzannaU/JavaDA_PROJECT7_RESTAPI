@@ -11,14 +11,19 @@ public class RuleName {
     // TODO: Map columns in data table RULENAME with corresponding java fields
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="id")
     private Integer id;
 
     private String name;
     private String description;
     private String json;
     private String template;
+
+    @Column(name="sqlStr")
     private String sqlStr;
+
+    @Column(name="sqlPart")
     private String sqlPart;
 
     public RuleName(String name, String description, String json, String template, String sqlStr, String sqlPart) {

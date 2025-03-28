@@ -19,34 +19,58 @@ public class BidList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="BidListId")
     private Integer bidListId;
 
     @NotBlank(message = "Account is mandatory")
+    @Column(name="account")
     private String account;
 
     @NotBlank(message = "Type is mandatory")
+    @Column(name="type")
     private String type;
 
-    @Digits(message = "message", integer = 10, fraction = 1)
+    //@Digits(message = "message", integer = 10, fraction = 1)
+    @Column(name="bidQuantity")
     private double bidQuantity;
 
+    @Column(name="askQuantity")
     private double askQuantity;
+
     private double bid;
     private double ask;
     private String benchmark;
+
+    @Column(name="bidListDate")
     private Timestamp bidListDate;
+
     private String commentary;
     private String security;
     private String status;
     private String trader;
     private String book;
+
+    @Column(name="creationName")
     private String creationName;
+
+    @Column(name="creationDate")
     private Timestamp creationDate;
+
+    @Column(name="revisionName")
     private String revisionName;
+
+    @Column(name="revisionDate")
     private Timestamp revisionDate;
+
+    @Column(name="dealName")
     private String dealName;
+
+    @Column(name="dealType")
     private String dealType;
+
+    @Column(name="sourceListId")
     private String sourceListId;
+
     private String side;
 
     public BidList(String account, String type, double bidQuantity) {

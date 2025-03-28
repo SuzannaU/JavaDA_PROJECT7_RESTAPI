@@ -14,28 +14,55 @@ public class Trade {
     // TODO: Map columns in data table TRADE with corresponding java fields
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="TradeId")
     private Integer tradeId;
 
     private String account;
     private String type;
+
+    @Column(name="buyQuantity")
     private double buyQuantity;
+
+    @Column(name="sellQuantity")
     private double sellQuantity;
+
+    @Column(name="buyPrice")
     private double buyPrice;
+
+    @Column(name="sellPrice")
     private double sellPrice;
+
+    @Column(name="tradeDate")
     private Timestamp tradeDate;
+
     private String security;
     private String status;
     private String trader;
     private String benchmark;
     private String book;
+
+    @Column(name="creationName")
     private String creationName;
+
+    @Column(name="creationDate")
     private Timestamp creationDate;
+
+    @Column(name="revisionName")
     private String revisionName;
+
+    @Column(name="revisionDate")
     private Timestamp revisionDate;
+
+    @Column(name="dealName")
     private String dealName;
+
+    @Column(name="dealType")
     private String dealType;
+
+    @Column(name="sourceListId")
     private String sourceListId;
+
     private String side;
 
     public Trade(String account, String type) {

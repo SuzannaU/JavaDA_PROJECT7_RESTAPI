@@ -13,12 +13,20 @@ public class Rating {
     // TODO: Map columns in data table RATING with corresponding java fields
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="id")
     private Integer id;
 
+    @Column(name="moodysRating")
     private String moodysRating;
+
+    @Column(name="sandRating")
     private String sandRating;
+
+    @Column(name="fitchRating")
     private String fitchRating;
+
+    @Column(name="orderNumber")
     private int orderNumber;
 
     public Rating(String moodysRating, String sandRating, String fitchRating, int orderNumber) {

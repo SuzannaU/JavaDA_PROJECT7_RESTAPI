@@ -8,6 +8,8 @@
 </head>
 <body>
 <div class="container">
+	<p>Utilisateur : <span th:text="${#authentication.name}"></span>
+		| Rôle(s) : <span th:text="${#authentication.authorities}"></span></p>
 
 	<div class="row">
 		<h2>Add New Bid</h2>
