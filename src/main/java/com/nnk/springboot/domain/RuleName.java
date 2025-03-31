@@ -1,6 +1,7 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 //import javax.persistence.*;
 //import javax.validation.constraints.NotBlank;
 //import java.sql.Timestamp;
@@ -8,21 +9,29 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "rulename")
 public class RuleName {
-    // TODO: Map columns in data table RULENAME with corresponding java fields
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id")
     private Integer id;
 
+    @NotBlank(message="Name is mandatory")
     private String name;
+
+    @NotBlank(message="Description is mandatory")
     private String description;
+
+    @NotBlank(message="Json is mandatory")
     private String json;
+
+    @NotBlank(message="Template is mandatory")
     private String template;
 
+    @NotBlank(message="SQL is mandatory")
     @Column(name="sqlStr")
     private String sqlStr;
 
+    @NotBlank(message="SQL Part is mandatory")
     @Column(name="sqlPart")
     private String sqlPart;
 
