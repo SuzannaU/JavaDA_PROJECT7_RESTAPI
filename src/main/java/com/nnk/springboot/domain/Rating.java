@@ -1,31 +1,31 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
-
-//import javax.persistence.*;
-//import javax.validation.constraints.NotBlank;
-//import javax.validation.constraints.NotNull;
-//import java.sql.Timestamp;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "rating")
 public class Rating {
-    // TODO: Map columns in data table RATING with corresponding java fields
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id")
     private Integer id;
 
+    @NotBlank(message = "MoodysRating is mandatory")
     @Column(name="moodysRating")
     private String moodysRating;
 
+    @NotBlank(message = "SandRating is mandatory")
     @Column(name="sandRating")
     private String sandRating;
 
+    @NotBlank(message = "FitchRating is mandatory")
     @Column(name="fitchRating")
     private String fitchRating;
 
+    @DecimalMin(value = "1", message = "Order Number must be at least 1")
     @Column(name="orderNumber")
     private int orderNumber;
 
