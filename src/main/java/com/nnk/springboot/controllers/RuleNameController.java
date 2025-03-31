@@ -52,7 +52,7 @@ public class RuleNameController {
     }
 
     @PostMapping("/ruleName/update/{id}")
-    public String updateRuleName(@PathVariable("id") Integer id, @Valid RuleName ruleName,
+    public String updateRule(@PathVariable("id") Integer id, @Valid RuleName ruleName,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "ruleName/update";
@@ -63,7 +63,7 @@ public class RuleNameController {
     }
 
     @GetMapping("/ruleName/delete/{id}")
-    public String deleteRuleName(@PathVariable("id") Integer id, Model model) {
+    public String deleteRule(@PathVariable("id") Integer id, Model model) {
         RuleName ruleName = ruleNameRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid RuleName Id: " + id));
         ruleNameRepository.delete(ruleName);
