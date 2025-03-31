@@ -17,9 +17,9 @@ public class Rating {
     @Column(name="moodysRating")
     private String moodysRating;
 
-    @NotBlank(message = "SandRating is mandatory")
-    @Column(name="sandRating")
-    private String sandRating;
+    @NotBlank(message = "SandPRating is mandatory")
+    @Column(name="sandPRating")
+    private String sandPRating;
 
     @NotBlank(message = "FitchRating is mandatory")
     @Column(name="fitchRating")
@@ -29,9 +29,9 @@ public class Rating {
     @Column(name="orderNumber")
     private int orderNumber;
 
-    public Rating(String moodysRating, String sandRating, String fitchRating, int orderNumber) {
+    public Rating(String moodysRating, String sandPRating, String fitchRating, int orderNumber) {
         this.moodysRating = moodysRating;
-        this.sandRating = sandRating;
+        this.sandPRating = sandPRating;
         this.fitchRating = fitchRating;
         this.orderNumber = orderNumber;
     }
@@ -55,12 +55,12 @@ public class Rating {
         this.moodysRating = moodysRating;
     }
 
-    public String getSandRating() {
-        return sandRating;
+    public String getSandPRating() {
+        return sandPRating;
     }
 
-    public void setSandRating(String sandRating) {
-        this.sandRating = sandRating;
+    public void setSandPRating(String sandPRating) {
+        this.sandPRating = sandPRating;
     }
 
     public String getFitchRating() {
