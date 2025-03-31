@@ -1,6 +1,8 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 
 import java.sql.Timestamp;
 //import javax.persistence.*;
@@ -18,9 +20,13 @@ public class Trade {
     @Column(name="TradeId")
     private Integer tradeId;
 
+    @NotBlank(message="Account is mandatory")
     private String account;
+
+    @NotBlank(message="Type is mandatory")
     private String type;
 
+    @DecimalMin(value = "1.0", message = "Buy Quantity must be at least 1.0")
     @Column(name="buyQuantity")
     private double buyQuantity;
 
@@ -65,9 +71,10 @@ public class Trade {
 
     private String side;
 
-    public Trade(String account, String type) {
+    public Trade(String account, String type, double buyQuantity) {
         this.account = account;
         this.type = type;
+        this.buyQuantity = buyQuantity;
     }
 
     public Trade() {

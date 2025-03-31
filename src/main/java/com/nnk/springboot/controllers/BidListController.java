@@ -46,7 +46,7 @@ public class BidListController {
     @GetMapping("/bidList/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
         BidList bidList = bidListRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Invalid bidList Id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid bidList Id: " + id));
         model.addAttribute("bidList", bidList);
         return "bidList/update";
     }
@@ -65,7 +65,7 @@ public class BidListController {
     @GetMapping("/bidList/delete/{id}")
     public String deleteBid(@PathVariable("id") Integer id, Model model) {
         BidList bidList = bidListRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Invalid bidList Id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid bidList Id: " + id));
         bidListRepository.delete(bidList);
         model.addAttribute("bidLists", bidListRepository.findAll());
         return "redirect:/bidList/list";
