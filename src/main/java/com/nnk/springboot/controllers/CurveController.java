@@ -24,7 +24,7 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/add")
-    public String addBidForm(Model model) {
+    public String addCurveForm(Model model) {
         CurvePoint curvePoint = new CurvePoint();
         model.addAttribute("curvePoint", curvePoint);
         return "curvePoint/add";
@@ -52,7 +52,7 @@ public class CurveController {
     }
 
     @PostMapping("/curvePoint/update/{id}")
-    public String updateBid(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint,
+    public String updateCurve(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint,
                             BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "curvePoint/update";
@@ -63,7 +63,7 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, Model model) {
+    public String deleteCurve(@PathVariable("id") Integer id, Model model) {
         CurvePoint curvePoint = curvePointRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CurvePoint Id: " + id));
         curvePointRepository.delete(curvePoint);

@@ -20,17 +20,17 @@ public class CurvePointTests {
 
 	@Test
 	public void curvePointTest() {
-		CurvePoint curvePoint = new CurvePoint(10, 10d, 30d);
+		CurvePoint curvePoint = new CurvePoint(10d, 10d);
 
 		// Save
 		curvePoint = curvePointRepository.save(curvePoint);
 		assertNotNull(curvePoint.getId());
-		assertTrue(curvePoint.getCurveId() == 10);
+		assertTrue(curvePoint.getTerm() == 10);
 
 		// Update
-		curvePoint.setCurveId(20);
+		curvePoint.setTerm(20);
 		curvePoint = curvePointRepository.save(curvePoint);
-		assertTrue(curvePoint.getCurveId() == 20);
+		assertTrue(curvePoint.getTerm() == 20);
 
 		// Find
 		List<CurvePoint> listResult = curvePointRepository.findAll();

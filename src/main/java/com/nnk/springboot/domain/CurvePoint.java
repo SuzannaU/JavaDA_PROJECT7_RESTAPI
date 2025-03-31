@@ -15,7 +15,7 @@ public class CurvePoint {
     @Column(name="id")
     private Integer id;
 
-    @NotNull(message = "must not be null")
+    //@NotNull(message = "must not be null")
     @Column(name="curveId")
     private int curveId;
 
@@ -31,8 +31,7 @@ public class CurvePoint {
     @Column(name="creationDate")
     private Timestamp creationDate;
 
-    public CurvePoint(int curveId, double term, double value) {
-        this.curveId = curveId;
+    public CurvePoint(double term, double value) {
         this.term = term;
         this.value = value;
     }
