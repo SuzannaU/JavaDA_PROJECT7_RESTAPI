@@ -6,8 +6,9 @@ import com.nnk.springboot.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -29,8 +30,11 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserRepository userRepository;
+
+    @MockitoBean
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Test
     @WithMockUser(roles = "USER")
@@ -63,6 +67,7 @@ public class UserControllerTest {
     public void validateTest() throws Exception {
 
         User validUser = new User("username", "password", "fullname", "role");
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any())).thenReturn(validUser);
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -74,7 +79,7 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/user/list"));
 
-        //verify(bCryptPasswordEncoder).encode(anyString());
+        verify(passwordEncoder).encode(anyString());
         verify(userRepository).save(any());
         verify(userRepository).findAll();
     }
@@ -145,7 +150,9 @@ public class UserControllerTest {
     @WithMockUser(roles = "USER")
     public void updateUserTest() throws Exception {
 
-        User validUser = new User("username", "password", "fullname", "role");when(userRepository.save(any())).thenReturn(validUser);
+        User validUser = new User("username", "password", "fullname", "role");
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(userRepository.save(any())).thenReturn(validUser);
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
 
 
@@ -156,6 +163,7 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/user/list"));
 
+        verify(passwordEncoder).encode(anyString());
         verify(userRepository).save(any());
         verify(userRepository).findAll();
     }
