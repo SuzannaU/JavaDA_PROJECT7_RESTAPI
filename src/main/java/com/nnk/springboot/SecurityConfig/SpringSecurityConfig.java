@@ -26,7 +26,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/").permitAll();
                     auth.requestMatchers("/403").permitAll();
-                    auth.requestMatchers("/static.css/**").permitAll();
+                    auth.requestMatchers("/css/**").permitAll();
                     auth.requestMatchers("/user/**").hasRole("ADMIN");
                     auth.requestMatchers("/bidList/**").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers("/curvePoint/**").hasAnyRole("ADMIN", "USER");
@@ -35,7 +35,7 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/ruleName/**").hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
                 })
-                .formLogin(form->form
+                .formLogin(form -> form
                         .defaultSuccessUrl("/", true)
                         .permitAll())
                 .formLogin(Customizer.withDefaults())
@@ -48,7 +48,7 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(bCryptPasswordEncoder());

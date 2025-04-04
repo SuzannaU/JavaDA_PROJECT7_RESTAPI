@@ -25,7 +25,7 @@ public class SecurityConfig {
 //        return http
 //                .authorizeHttpRequests(auth->{
 //                    auth.requestMatchers("/").permitAll();
-//                    auth.requestMatchers("/css/**").permitAll();
+//                    auth.requestMatchers("/2/**").permitAll();
 //                    auth.requestMatchers("/bidList/**").authenticated();
 //                    auth.requestMatchers("/curvePoint/**").authenticated();
 //                    auth.requestMatchers("/rating/**").authenticated();

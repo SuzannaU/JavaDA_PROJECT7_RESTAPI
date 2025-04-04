@@ -38,13 +38,13 @@ public class UserController {
 
     @PostMapping("/user/validate")
     public String validate(@Valid User user, BindingResult result, Model model) {
-        if (!result.hasErrors()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
-            model.addAttribute("users", userRepository.findAll());
-            return "redirect:/user/list";
+        if (result.hasErrors()) {
+            return "user/add";
         }
-        return "user/add";
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        model.addAttribute("users", userRepository.findAll());
+        return "redirect:/user/list";
     }
 
     @GetMapping("/user/update/{id}")
