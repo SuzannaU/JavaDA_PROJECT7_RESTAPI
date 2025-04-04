@@ -38,7 +38,7 @@ public class TradeTests {
 		// Delete
 		Integer id = trade.getTradeId();
 		tradeRepository.delete(trade);
-		Optional<Trade> tradeList = tradeRepository.findById(id);
-		assertFalse(tradeList.isPresent());
+		Optional<Trade> optTrade = tradeRepository.findById(id);
+		assertFalse(optTrade.isPresent());
 	}
 }

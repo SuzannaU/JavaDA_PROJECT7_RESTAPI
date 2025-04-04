@@ -38,7 +38,7 @@ public class RuleTests {
 		// Delete
 		Integer id = rule.getId();
 		ruleNameRepository.delete(rule);
-		Optional<RuleName> ruleList = ruleNameRepository.findById(id);
-		assertFalse(ruleList.isPresent());
+		Optional<RuleName> optRule = ruleNameRepository.findById(id);
+		assertFalse(optRule.isPresent());
 	}
 }

@@ -38,7 +38,7 @@ public class RatingTests {
 		// Delete
 		Integer id = rating.getId();
 		ratingRepository.delete(rating);
-		Optional<Rating> ratingList = ratingRepository.findById(id);
-		assertFalse(ratingList.isPresent());
+		Optional<Rating> optRating = ratingRepository.findById(id);
+		assertFalse(optRating.isPresent());
 	}
 }
