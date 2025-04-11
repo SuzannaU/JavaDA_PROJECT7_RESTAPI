@@ -3,7 +3,12 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.controllers.UserController;
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +41,21 @@ public class UserControllerTest {
 
     @MockitoBean
     private BCryptPasswordEncoder passwordEncoder;
+
+    private User validUser;
+
+    @BeforeEach
+    public void setup() {
+        validUser = new User("username", "Password123&", "fullname", "role");
+    }
+
+    private static Stream<Arguments> invalidUserProvider() {
+        return Stream.of(
+                Arguments.of("invalidUsername", new User("", "Password123&", "fullname", "role"), "username"),
+                Arguments.of("invalidFullname", new User("username", "Password123&", "", "role"), "fullname"),
+                Arguments.of("invalidRole", new User("username", "Password123&", "fullname", ""), "role")
+        );
+    }
 
     @Test
     @WithMockUser(roles = "USER")
@@ -66,11 +87,9 @@ public class UserControllerTest {
     @WithMockUser(roles = "USER")
     public void validateTest() throws Exception {
 
-        User validUser = new User("username", "password", "fullname", "role");
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any())).thenReturn(validUser);
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/user/validate")
                         .flashAttr("user", validUser)
@@ -84,26 +103,15 @@ public class UserControllerTest {
         verify(userRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"nouppercase1&", "NoDigits&", "NoSymbol123", "Under8&"})
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors() throws Exception {
-
-        User invalidUserUsername = new User("", "password", "fullname", "role");
-        User invalidUserPassword = new User("username", "", "fullname", "role");
-        User invalidUserFullname = new User("username", "password", "", "role");
-        User invalidUserRole = new User("username", "password", "fullname", "");
+    public void passwordValidationTest(String invalidPassword) throws Exception {
+        User invalidUser = new User("username", "", "fullname", "role");
+        invalidUser.setPassword(invalidPassword);
 
         this.mockMvc.perform(post("/user/validate")
-                        .flashAttr("user", invalidUserUsername)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("user/add"))
-                .andExpect(content().string(containsString("Add New User")))
-                .andExpect(model().attributeHasFieldErrors("user", "username"));
-
-        this.mockMvc.perform(post("/user/validate")
-                        .flashAttr("user", invalidUserPassword)
+                        .flashAttr("user", invalidUser)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -111,30 +119,35 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("Add New User")))
                 .andExpect(model().attributeHasFieldErrors("user", "password"));
 
-        this.mockMvc.perform(post("/user/validate")
-                        .flashAttr("user", invalidUserFullname)
+        this.mockMvc.perform(post("/user/update/{id}", 1)
+                        .flashAttr("user", invalidUser)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("user/add"))
-                .andExpect(content().string(containsString("Add New User")))
-                .andExpect(model().attributeHasFieldErrors("user", "fullname"));
+                .andExpect(view().name("user/update"))
+                .andExpect(content().string(containsString("Update User")))
+                .andExpect(model().attributeHasFieldErrors("user", "password"));
+    }
+
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidUserProvider")
+    @WithMockUser(roles = "USER")
+    public void validateTest_withErrors(String testedAttribute, User invalidUser, String error) throws Exception {
 
         this.mockMvc.perform(post("/user/validate")
-                        .flashAttr("user", invalidUserRole)
+                        .flashAttr("user", invalidUser)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/add"))
                 .andExpect(content().string(containsString("Add New User")))
-                .andExpect(model().attributeHasFieldErrors("user", "role"));
+                .andExpect(model().attributeHasFieldErrors("user", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void showUpdateFormTest() throws Exception {
 
-        User validUser = new User("username", "password", "fullname", "role");
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
 
         this.mockMvc.perform(get("/user/update/{id}", 1))
@@ -150,11 +163,9 @@ public class UserControllerTest {
     @WithMockUser(roles = "USER")
     public void updateUserTest() throws Exception {
 
-        User validUser = new User("username", "password", "fullname", "role");
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any())).thenReturn(validUser);
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/user/update/{id}", 1)
                         .flashAttr("user", validUser)
@@ -168,57 +179,25 @@ public class UserControllerTest {
         verify(userRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidUserProvider")
     @WithMockUser(roles = "USER")
-    public void updateUserTest_withErrors() throws Exception {
-
-        User invalidUserUsername = new User("", "password", "fullname", "role");
-        User invalidUserPassword = new User("username", "", "fullname", "role");
-        User invalidUserFullname = new User("username", "password", "", "role");
-        User invalidUserRole = new User("username", "password", "fullname", "");
+    public void updateUserTest_withErrors(String testedAttribute, User invalidUser, String error) throws Exception {
 
         this.mockMvc.perform(post("/user/update/{id}", 1)
-                        .flashAttr("user", invalidUserUsername)
+                        .flashAttr("user", invalidUser)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/update"))
                 .andExpect(content().string(containsString("Update User")))
-                .andExpect(model().attributeHasFieldErrors("user", "username"));
-
-        this.mockMvc.perform(post("/user/update/{id}", 1)
-                        .flashAttr("user", invalidUserPassword)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("user/update"))
-                .andExpect(content().string(containsString("Update User")))
-                .andExpect(model().attributeHasFieldErrors("user", "password"));
-
-        this.mockMvc.perform(post("/user/update/{id}", 1)
-                        .flashAttr("user", invalidUserFullname)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("user/update"))
-                .andExpect(content().string(containsString("Update User")))
-                .andExpect(model().attributeHasFieldErrors("user", "fullname"));
-
-        this.mockMvc.perform(post("/user/update/{id}", 1)
-                        .flashAttr("user", invalidUserRole)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("user/update"))
-                .andExpect(content().string(containsString("Update User")))
-                .andExpect(model().attributeHasFieldErrors("user", "role"));
+                .andExpect(model().attributeHasFieldErrors("user", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void deleteUserTest() throws Exception {
 
-        User validUser = new User("username", "password", "fullname", "role");
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
         doNothing().when(userRepository).delete(any(User.class));
         when(userRepository.findAll()).thenReturn(new ArrayList<>());

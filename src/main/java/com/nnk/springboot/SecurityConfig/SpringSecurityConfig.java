@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -25,21 +25,27 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/").permitAll();
-                    auth.requestMatchers("/403").permitAll();
-                    auth.requestMatchers("/css/**").permitAll();
-                    auth.requestMatchers("/user/**").hasRole("ADMIN");
-                    auth.requestMatchers("/bidList/**").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers("/curvePoint/**").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers("/rating/**").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers("/trade/**").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers("/ruleName/**").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(
+                                    "/",
+                                    "/403",
+                                    "/css/**")
+                            .permitAll();
+                    auth.requestMatchers("/user/**")
+                            .hasRole("ADMIN");
+                    auth.requestMatchers(
+                                    "/bidList/**",
+                                    "/curvePoint/**",
+                                    "/rating/**",
+                                    "/trade/**",
+                                    "/ruleName/**")
+                            .hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(form -> form
                         .defaultSuccessUrl("/", true)
                         .permitAll())
-                .formLogin(Customizer.withDefaults())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .build();
     }
 

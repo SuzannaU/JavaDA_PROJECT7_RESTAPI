@@ -3,7 +3,11 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.controllers.RatingController;
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.repositories.RatingRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -12,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +36,23 @@ public class RatingControllerTest {
 
     @MockitoBean
     private RatingRepository ratingRepository;
+
+    private Rating validRating;
+
+    @BeforeEach
+    public void setup() {
+        validRating = new Rating("Moodys", "SandP", "Fitch", 10);
+
+    }
+
+    private static Stream<Arguments> invalidRatingProvider() {
+        return Stream.of(
+                Arguments.of("invalidMoodys", new Rating("", "SandP", "Fitch", 10), "moodysRating"),
+                Arguments.of("invalidSandP", new Rating("Moodys", "", "Fitch", 10), "sandPRating"),
+                Arguments.of("invalidFitch", new Rating("Moodys", "SandP", "", 10), "fitchRating"),
+                Arguments.of("invalidOrder", new Rating("Moodys", "SandP", "Fitch", 0), "orderNumber")
+        );
+    }
 
     @Test
     @WithMockUser(roles = "USER")
@@ -62,10 +84,8 @@ public class RatingControllerTest {
     @WithMockUser(roles = "USER")
     public void validateTest() throws Exception {
 
-        Rating validRating = new Rating("Moodys", "SandP", "Fitch", 10);
         when(ratingRepository.save(any())).thenReturn(validRating);
         when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/rating/validate")
                         .flashAttr("rating", validRating)
@@ -78,57 +98,25 @@ public class RatingControllerTest {
         verify(ratingRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidRatingProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors() throws Exception {
-
-        Rating invalidRatingMoodys = new Rating("", "SandP", "Fitch", 10);
-        Rating invalidRatingSandP = new Rating("Moodys", "", "Fitch", 10);
-        Rating invalidRatingFitch = new Rating("Moodys", "SandP", "", 10);
-        Rating invalidRatingOrder = new Rating("Moodys", "SandP", "Fitch", 0);
+    public void validateTest_withErrors(String testedAttribute, Rating invalidRating, String error) throws Exception {
 
         this.mockMvc.perform(post("/rating/validate")
-                        .flashAttr("rating", invalidRatingMoodys)
+                        .flashAttr("rating", invalidRating)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("rating/add"))
                 .andExpect(content().string(containsString("Add New Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "moodysRating"));
-
-        this.mockMvc.perform(post("/rating/validate")
-                        .flashAttr("rating", invalidRatingSandP)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("rating/add"))
-                .andExpect(content().string(containsString("Add New Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "sandPRating"));
-
-        this.mockMvc.perform(post("/rating/validate")
-                        .flashAttr("rating", invalidRatingFitch)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("rating/add"))
-                .andExpect(content().string(containsString("Add New Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "fitchRating"));
-
-        this.mockMvc.perform(post("/rating/validate")
-                        .flashAttr("rating", invalidRatingOrder)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("rating/add"))
-                .andExpect(content().string(containsString("Add New Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "orderNumber"));
+                .andExpect(model().attributeHasFieldErrors("rating", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void showUpdateFormTest() throws Exception {
 
-        Rating validRating = new Rating("Moodys", "SandP", "Fitch", 10);
         when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(validRating));
 
         this.mockMvc.perform(get("/rating/update/{id}", 1))
@@ -144,10 +132,8 @@ public class RatingControllerTest {
     @WithMockUser(roles = "USER")
     public void updateBidTest() throws Exception {
 
-        Rating validRating = new Rating("Moodys", "SandP", "Fitch", 10);
         when(ratingRepository.save(any())).thenReturn(validRating);
         when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/rating/update/{id}", 1)
                         .flashAttr("rating", validRating)
@@ -160,57 +146,25 @@ public class RatingControllerTest {
         verify(ratingRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidRatingProvider")
     @WithMockUser(roles = "USER")
-    public void updateBidTest_withErrors() throws Exception {
-
-        Rating invalidRatingMoodys = new Rating("", "SandP", "Fitch", 10);
-        Rating invalidRatingSandP = new Rating("Moodys", "", "Fitch", 10);
-        Rating invalidRatingFitch = new Rating("Moodys", "SandP", "", 10);
-        Rating invalidRatingOrder = new Rating("Moodys", "SandP", "Fitch", 0);
+    public void updateBidTest_withErrors(String testedAttribute, Rating invalidRating, String error) throws Exception {
 
         this.mockMvc.perform(post("/rating/update/{id}", 1)
-                        .flashAttr("rating", invalidRatingMoodys)
+                        .flashAttr("rating", invalidRating)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("rating/update"))
                 .andExpect(content().string(containsString("Update Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "moodysRating"));
-
-        this.mockMvc.perform(post("/rating/update/{id}", 1)
-                        .flashAttr("rating", invalidRatingSandP)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("rating/update"))
-                .andExpect(content().string(containsString("Update Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "sandPRating"));
-
-        this.mockMvc.perform(post("/rating/update/{id}", 1)
-                        .flashAttr("rating", invalidRatingFitch)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("rating/update"))
-                .andExpect(content().string(containsString("Update Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "fitchRating"));
-
-        this.mockMvc.perform(post("/rating/update/{id}", 1)
-                        .flashAttr("rating", invalidRatingOrder)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("rating/update"))
-                .andExpect(content().string(containsString("Update Rating")))
-                .andExpect(model().attributeHasFieldErrors("rating", "orderNumber"));
+                .andExpect(model().attributeHasFieldErrors("rating", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void deleteBidTest() throws Exception {
 
-        Rating validRating = new Rating("Moodys", "SandP", "Fitch", 10);
         when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(validRating));
         doNothing().when(ratingRepository).delete(any());
         when(ratingRepository.findAll()).thenReturn(new ArrayList<>());

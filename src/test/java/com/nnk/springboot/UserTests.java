@@ -21,7 +21,7 @@ public class UserTests {
 
     @Test
     public void UserTest() {
-        User user = new User("username", "password", "fullname", "role");
+        User user = new User("username", "Password123&", "fullname", "role");
 
         // Save
         user = userRepository.save(user);

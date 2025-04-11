@@ -3,7 +3,11 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.controllers.RuleNameController;
 import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.repositories.RuleNameRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -12,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,7 +35,32 @@ public class RuleNameControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private RuleNameRepository  ruleNameRepository;
+    private RuleNameRepository ruleNameRepository;
+
+    private RuleName validRuleName;
+
+    @BeforeEach
+    public void setup() {
+        validRuleName = new RuleName(
+                "name", "description", "json", "template", "sqlStr", "sqlPart");
+    }
+
+    private static Stream<Arguments> invalidRuleNameProvider() {
+        return Stream.of(
+                Arguments.of("invalidName", new RuleName(
+                        "", "description", "json", "template", "sqlStr", "sqlPart"), "name"),
+                Arguments.of("invalidDescription", new RuleName(
+                        "name", "", "json", "template", "sqlStr", "sqlPart"), "description"),
+                Arguments.of("invalidJson", new RuleName(
+                        "name", "description", "", "template", "sqlStr", "sqlPart"), "json"),
+                Arguments.of("invalidTemplate", new RuleName(
+                        "name", "description", "json", "", "sqlStr", "sqlPart"), "template"),
+                Arguments.of("invalidSqlStr", new RuleName(
+                        "name", "description", "json", "template", "", "sqlPart"), "sqlStr"),
+                Arguments.of("invalidSqlPart", new RuleName(
+                        "name", "description", "json", "template", "sqlStr", ""), "sqlPart")
+        );
+    }
 
     @Test
     @WithMockUser(roles = "USER")
@@ -62,11 +92,8 @@ public class RuleNameControllerTest {
     @WithMockUser(roles = "USER")
     public void validateTest() throws Exception {
 
-        RuleName validRuleName = new RuleName(
-                "name", "description","json","template","sqlStr","sqlPart");
         when(ruleNameRepository.save(any())).thenReturn(validRuleName);
         when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/ruleName/validate")
                         .flashAttr("ruleName", validRuleName)
@@ -79,22 +106,10 @@ public class RuleNameControllerTest {
         verify(ruleNameRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidRuleNameProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors() throws Exception {
-
-        RuleName invalidRuleName = new RuleName(
-                "", "description","json","template","sqlStr","sqlPart");
-        RuleName invalidRuleDescription = new RuleName(
-                "name", "","json","template","sqlStr","sqlPart");
-        RuleName invalidRuleJson = new RuleName(
-                "name", "description","","template","sqlStr","sqlPart");
-        RuleName invalidRuleTemplate = new RuleName(
-                "name", "description","json","","sqlStr","sqlPart");
-        RuleName invalidRuleSqlStr = new RuleName(
-                "name", "description","json","template","","sqlPart");
-        RuleName invalidRuleSqlPart = new RuleName(
-                "name", "description","json","template","sqlStr","");
+    public void validateTest_withErrors(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
 
         this.mockMvc.perform(post("/ruleName/validate")
                         .flashAttr("ruleName", invalidRuleName)
@@ -103,60 +118,13 @@ public class RuleNameControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("ruleName/add"))
                 .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "name"));
-
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", invalidRuleDescription)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
-                .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "description"));
-
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", invalidRuleJson)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
-                .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "json"));
-
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", invalidRuleTemplate)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
-                .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "template"));
-
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", invalidRuleSqlStr)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
-                .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "sqlStr"));
-
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", invalidRuleSqlPart)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
-                .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "sqlPart"));
+                .andExpect(model().attributeHasFieldErrors("ruleName", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void showUpdateFormTest() throws Exception {
 
-        RuleName validRuleName = new RuleName(
-                "name", "description","json","template","sqlStr","sqlPart");
         when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(validRuleName));
 
         this.mockMvc.perform(get("/ruleName/update/{id}", 1))
@@ -172,11 +140,8 @@ public class RuleNameControllerTest {
     @WithMockUser(roles = "USER")
     public void updateRuleTest() throws Exception {
 
-        RuleName validRuleName = new RuleName(
-                "name", "description","json","template","sqlStr","sqlPart");
         when(ruleNameRepository.save(any())).thenReturn(validRuleName);
         when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/ruleName/update/{id}", 1)
                         .flashAttr("ruleName", validRuleName)
@@ -189,22 +154,10 @@ public class RuleNameControllerTest {
         verify(ruleNameRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidRuleNameProvider")
     @WithMockUser(roles = "USER")
-    public void updateRuleTest_withErrors() throws Exception {
-
-        RuleName invalidRuleName = new RuleName(
-                "", "description","json","template","sqlStr","sqlPart");
-        RuleName invalidRuleDescription = new RuleName(
-                "name", "","json","template","sqlStr","sqlPart");
-        RuleName invalidRuleJson = new RuleName(
-                "name", "description","","template","sqlStr","sqlPart");
-        RuleName invalidRuleTemplate = new RuleName(
-                "name", "description","json","","sqlStr","sqlPart");
-        RuleName invalidRuleSqlStr = new RuleName(
-                "name", "description","json","template","","sqlPart");
-        RuleName invalidRuleSqlPart = new RuleName(
-                "name", "description","json","template","sqlStr","");
+    public void updateRuleTest_withErrors(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
 
         this.mockMvc.perform(post("/ruleName/update/{id}", 1)
                         .flashAttr("ruleName", invalidRuleName)
@@ -213,60 +166,13 @@ public class RuleNameControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("ruleName/update"))
                 .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "name"));
-
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", invalidRuleDescription)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
-                .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "description"));
-
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", invalidRuleJson)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
-                .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "json"));
-
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", invalidRuleTemplate)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
-                .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "template"));
-
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", invalidRuleSqlStr)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
-                .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "sqlStr"));
-
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", invalidRuleSqlPart)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
-                .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", "sqlPart"));
+                .andExpect(model().attributeHasFieldErrors("ruleName", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void deleteRuleTest() throws Exception {
 
-        RuleName validRuleName = new RuleName(
-                "name", "description","json","template","sqlStr","sqlPart");
         when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(validRuleName));
         doNothing().when(ruleNameRepository).delete(any());
         when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());

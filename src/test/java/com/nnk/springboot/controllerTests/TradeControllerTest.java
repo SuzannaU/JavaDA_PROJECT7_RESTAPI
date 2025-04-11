@@ -3,7 +3,11 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.controllers.TradeController;
 import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.repositories.TradeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -12,12 +16,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,9 +33,24 @@ public class TradeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    
+
     @MockitoBean
     private TradeRepository tradeRepository;
+
+    private Trade validTrade;
+
+    @BeforeEach
+    public void setup() {
+        validTrade = new Trade("account", "type", 10d);
+    }
+
+    private static Stream<Arguments> invalidTradeProvider() {
+        return Stream.of(
+                Arguments.of("invalidAccount", new Trade("", "type", 10d), "account"),
+                Arguments.of("invalidType", new Trade("account", "", 10d), "type"),
+                Arguments.of("invalidQuantity", new Trade("account", "type", 0.1d), "buyQuantity")
+        );
+    }
 
     @Test
     @WithMockUser(roles = "USER")
@@ -63,10 +82,8 @@ public class TradeControllerTest {
     @WithMockUser(roles = "USER")
     public void validateTest() throws Exception {
 
-        Trade validTrade = new Trade("account", "type", 10d);
         when(tradeRepository.save(any())).thenReturn(validTrade);
         when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/trade/validate")
                         .flashAttr("trade", validTrade)
@@ -79,47 +96,25 @@ public class TradeControllerTest {
         verify(tradeRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidTradeProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors() throws Exception {
-
-        Trade invalidTradeAccount = new Trade("", "type", 10d);
-        Trade invalidTradeType = new Trade("account", "", 10d);
-        Trade invalidTradeQty = new Trade("account", "type", 0.1d);
+    public void validateTest_withErrors(String testedAttribute, Trade invalidTrade, String error) throws Exception {
 
         this.mockMvc.perform(post("/trade/validate")
-                        .flashAttr("trade", invalidTradeAccount)
+                        .flashAttr("trade", invalidTrade)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("trade/add"))
                 .andExpect(content().string(containsString("Add New Trade")))
-                .andExpect(model().attributeHasFieldErrors("trade", "account"));
-
-        this.mockMvc.perform(post("/trade/validate")
-                        .flashAttr("trade", invalidTradeType)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("trade/add"))
-                .andExpect(content().string(containsString("Add New Trade")))
-                .andExpect(model().attributeHasFieldErrors("trade", "type"));
-
-        this.mockMvc.perform(post("/trade/validate")
-                        .flashAttr("trade", invalidTradeQty)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("trade/add"))
-                .andExpect(content().string(containsString("Add New Trade")))
-                .andExpect(model().attributeHasFieldErrors("trade", "buyQuantity"));
+                .andExpect(model().attributeHasFieldErrors("trade", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void showUpdateFormTest() throws Exception {
 
-        Trade validTrade = new Trade("account", "type", 10d);
         when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(validTrade));
 
         this.mockMvc.perform(get("/trade/update/{id}", 1))
@@ -135,10 +130,8 @@ public class TradeControllerTest {
     @WithMockUser(roles = "USER")
     public void updateTradeTest() throws Exception {
 
-        Trade validTrade = new Trade("account", "type", 10d);
         when(tradeRepository.save(any())).thenReturn(validTrade);
         when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
-
 
         this.mockMvc.perform(post("/trade/update/{id}", 1)
                         .flashAttr("trade", validTrade)
@@ -151,47 +144,25 @@ public class TradeControllerTest {
         verify(tradeRepository).findAll();
     }
 
-    @Test
+    @ParameterizedTest(name = "{0} should return {2} error")
+    @MethodSource("invalidTradeProvider")
     @WithMockUser(roles = "USER")
-    public void updateTradeTest_withErrors() throws Exception {
-
-        Trade invalidTradeAccount = new Trade("", "type", 10d);
-        Trade invalidTradeType = new Trade("account", "", 10d);
-        Trade invalidTradeQty = new Trade("account", "type", 0.1d);
+    public void updateTradeTest_withErrors(String testedAttribute, Trade invalidTrade, String error) throws Exception {
 
         this.mockMvc.perform(post("/trade/update/{id}", 1)
-                        .flashAttr("trade", invalidTradeAccount)
+                        .flashAttr("trade", invalidTrade)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("trade/update"))
                 .andExpect(content().string(containsString("Update Trade")))
-                .andExpect(model().attributeHasFieldErrors("trade", "account"));
-
-        this.mockMvc.perform(post("/trade/update/{id}", 1)
-                        .flashAttr("trade", invalidTradeType)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("trade/update"))
-                .andExpect(content().string(containsString("Update Trade")))
-                .andExpect(model().attributeHasFieldErrors("trade", "type"));
-
-        this.mockMvc.perform(post("/trade/update/{id}", 1)
-                        .flashAttr("trade", invalidTradeQty)
-                        .with(csrf().asHeader()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("trade/update"))
-                .andExpect(content().string(containsString("Update Trade")))
-                .andExpect(model().attributeHasFieldErrors("trade", "buyQuantity"));
+                .andExpect(model().attributeHasFieldErrors("trade", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void deleteTradeTest() throws Exception {
 
-        Trade validTrade = new Trade("account", "type", 10d);
         when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(validTrade));
         doNothing().when(tradeRepository).delete(any());
         when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
