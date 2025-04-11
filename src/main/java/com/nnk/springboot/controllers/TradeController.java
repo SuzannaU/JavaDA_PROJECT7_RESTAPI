@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("trade")
 public class TradeController {
 
     private final TradeRepository tradeRepository;
@@ -17,20 +18,20 @@ public class TradeController {
         this.tradeRepository = tradeRepository;
     }
 
-    @RequestMapping("/trade/list")
+    @RequestMapping("list")
     public String home(Model model) {
         model.addAttribute("trades", tradeRepository.findAll());
         return "trade/list";
     }
 
-    @GetMapping("/trade/add")
+    @GetMapping("add")
     public String addTradeForm(Model model) {
         Trade trade = new Trade();
         model.addAttribute("trade", trade);
         return "trade/add";
     }
 
-    @PostMapping("/trade/validate")
+    @PostMapping("validate")
     public String validate(
             @Valid @ModelAttribute("trade") Trade trade,
             BindingResult result,
@@ -43,7 +44,7 @@ public class TradeController {
         return "redirect:/trade/list";
     }
 
-    @GetMapping("/trade/update/{id}")
+    @GetMapping("update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
         Trade trade = tradeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Trade Id: " + id));
@@ -51,7 +52,7 @@ public class TradeController {
         return "trade/update";
     }
 
-    @PostMapping("/trade/update/{id}")
+    @PostMapping("update/{id}")
     public String updateTrade(@PathVariable("id") Integer id, @Valid Trade trade,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -62,7 +63,7 @@ public class TradeController {
         return "redirect:/trade/list";
     }
 
-    @GetMapping("/trade/delete/{id}")
+    @GetMapping("delete/{id}")
     public String deleteTrade(@PathVariable("id") Integer id, Model model) {
         Trade trade = tradeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Trade Id: " + id));

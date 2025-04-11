@@ -46,8 +46,10 @@ public class BidListControllerTest {
 
     private static Stream<Arguments> invalidBidListProvider() {
         return Stream.of(
-                Arguments.of("invalidAccount", new BidList("", "type", 10d), "account"),
-                Arguments.of("invalidType", new BidList("account", "", 10d), "type"),
+                Arguments.of("nullAccount", new BidList(null, "type", 10d), "account"),
+                Arguments.of("emptyAccount", new BidList("", "type", 10d), "account"),
+                Arguments.of("nullType", new BidList("account", null, 10d), "type"),
+                Arguments.of("emptyType", new BidList("account", "", 10d), "type"),
                 Arguments.of("invalidBidQuantity", new BidList("account", "type", 0.1d), "bidQuantity")
         );
     }

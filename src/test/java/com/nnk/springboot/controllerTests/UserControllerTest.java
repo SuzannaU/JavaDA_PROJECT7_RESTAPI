@@ -1,8 +1,10 @@
 package com.nnk.springboot.controllerTests;
 
+import com.nnk.springboot.SecurityConfig.SpringSecurityConfig;
 import com.nnk.springboot.controllers.UserController;
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;
+import com.nnk.springboot.services.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,10 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
+@Import({SpringSecurityConfig.class})
 public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
     private UserRepository userRepository;
@@ -51,14 +58,19 @@ public class UserControllerTest {
 
     private static Stream<Arguments> invalidUserProvider() {
         return Stream.of(
-                Arguments.of("invalidUsername", new User("", "Password123&", "fullname", "role"), "username"),
-                Arguments.of("invalidFullname", new User("username", "Password123&", "", "role"), "fullname"),
-                Arguments.of("invalidRole", new User("username", "Password123&", "fullname", ""), "role")
+                Arguments.of("nullUsername", new User(null, "Password123&", "fullname", "role"), "username"),
+                Arguments.of("emptyUsername", new User("", "Password123&", "fullname", "role"), "username"),
+                Arguments.of("nullPassword", new User("username", null, "fullname", "role"), "password"),
+                Arguments.of("emptyPassword", new User("username", "", "fullname", "role"), "password"),
+                Arguments.of("nullFullname", new User("username", "Password123&", null, "role"), "fullname"),
+                Arguments.of("emptyFullname", new User("username", "Password123&", "", "role"), "fullname"),
+                Arguments.of("nullRole", new User("username", "Password123&", "fullname", null), "role"),
+                Arguments.of("emptyRole", new User("username", "Password123&", "fullname", ""), "role")
         );
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void homeTest() throws Exception {
 
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
@@ -73,7 +85,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void addUserFormTest() throws Exception {
 
         this.mockMvc.perform(get("/user/add"))
@@ -84,7 +96,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void validateTest() throws Exception {
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
@@ -105,7 +117,7 @@ public class UserControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"nouppercase1&", "NoDigits&", "NoSymbol123", "Under8&"})
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void passwordValidationTest(String invalidPassword) throws Exception {
         User invalidUser = new User("username", "", "fullname", "role");
         invalidUser.setPassword(invalidPassword);
@@ -131,7 +143,7 @@ public class UserControllerTest {
 
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidUserProvider")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void validateTest_withErrors(String testedAttribute, User invalidUser, String error) throws Exception {
 
         this.mockMvc.perform(post("/user/validate")
@@ -145,7 +157,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void showUpdateFormTest() throws Exception {
 
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
@@ -160,7 +172,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void updateUserTest() throws Exception {
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
@@ -181,7 +193,7 @@ public class UserControllerTest {
 
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidUserProvider")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void updateUserTest_withErrors(String testedAttribute, User invalidUser, String error) throws Exception {
 
         this.mockMvc.perform(post("/user/update/{id}", 1)
@@ -195,7 +207,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "ADMIN")
     public void deleteUserTest() throws Exception {
 
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));

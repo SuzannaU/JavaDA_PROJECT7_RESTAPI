@@ -47,17 +47,29 @@ public class RuleNameControllerTest {
 
     private static Stream<Arguments> invalidRuleNameProvider() {
         return Stream.of(
-                Arguments.of("invalidName", new RuleName(
+                Arguments.of("nullName", new RuleName(
+                        null, "description", "json", "template", "sqlStr", "sqlPart"), "name"),
+                Arguments.of("emptyName", new RuleName(
                         "", "description", "json", "template", "sqlStr", "sqlPart"), "name"),
-                Arguments.of("invalidDescription", new RuleName(
+                Arguments.of("nullDescription", new RuleName(
+                        "name", null, "json", "template", "sqlStr", "sqlPart"), "description"),
+                Arguments.of("emptyDescription", new RuleName(
                         "name", "", "json", "template", "sqlStr", "sqlPart"), "description"),
-                Arguments.of("invalidJson", new RuleName(
+                Arguments.of("nullJson", new RuleName(
+                        "name", "description", null, "template", "sqlStr", "sqlPart"), "json"),
+                Arguments.of("emptyJson", new RuleName(
                         "name", "description", "", "template", "sqlStr", "sqlPart"), "json"),
-                Arguments.of("invalidTemplate", new RuleName(
+                Arguments.of("nullTemplate", new RuleName(
+                        "name", "description", "json", null, "sqlStr", "sqlPart"), "template"),
+                Arguments.of("emptyTemplate", new RuleName(
                         "name", "description", "json", "", "sqlStr", "sqlPart"), "template"),
-                Arguments.of("invalidSqlStr", new RuleName(
+                Arguments.of("nullSqlStr", new RuleName(
+                        "name", "description", "json", "template", null, "sqlPart"), "sqlStr"),
+                Arguments.of("emptySqlStr", new RuleName(
                         "name", "description", "json", "template", "", "sqlPart"), "sqlStr"),
-                Arguments.of("invalidSqlPart", new RuleName(
+                Arguments.of("nullSqlPart", new RuleName(
+                        "name", "description", "json", "template", "sqlStr", null), "sqlPart"),
+                Arguments.of("emptySqlPart", new RuleName(
                         "name", "description", "json", "template", "sqlStr", ""), "sqlPart")
         );
     }

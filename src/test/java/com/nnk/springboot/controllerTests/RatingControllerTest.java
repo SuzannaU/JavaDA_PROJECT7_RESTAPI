@@ -42,14 +42,16 @@ public class RatingControllerTest {
     @BeforeEach
     public void setup() {
         validRating = new Rating("Moodys", "SandP", "Fitch", 10);
-
     }
 
     private static Stream<Arguments> invalidRatingProvider() {
         return Stream.of(
-                Arguments.of("invalidMoodys", new Rating("", "SandP", "Fitch", 10), "moodysRating"),
-                Arguments.of("invalidSandP", new Rating("Moodys", "", "Fitch", 10), "sandPRating"),
-                Arguments.of("invalidFitch", new Rating("Moodys", "SandP", "", 10), "fitchRating"),
+                Arguments.of("nullMoodys", new Rating(null, "SandP", "Fitch", 10), "moodysRating"),
+                Arguments.of("emptyMoodys", new Rating("", "SandP", "Fitch", 10), "moodysRating"),
+                Arguments.of("nullSandP", new Rating("Moodys", null, "Fitch", 10), "sandPRating"),
+                Arguments.of("emptySandP", new Rating("Moodys", "", "Fitch", 10), "sandPRating"),
+                Arguments.of("nullFitch", new Rating("Moodys", "SandP", null, 10), "fitchRating"),
+                Arguments.of("emptyFitch", new Rating("Moodys", "SandP", "", 10), "fitchRating"),
                 Arguments.of("invalidOrder", new Rating("Moodys", "SandP", "Fitch", 0), "orderNumber")
         );
     }

@@ -2,15 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
       <title>Spring Boot</title>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" >
 </head>
 <body>
-   <h3>Access Denied Exception</h3>
+   <h3>Access Denied</h3>
    <div>
        Logged in user: <b th:text="${#authentication.name}" class="user"></b>
 	    <form th:action="@{/logout}" method="POST">
 	         <input type="submit" value="Logout"/>
 	    </form>
-   </div> 	 
-    <p class="error" th:text="${errorMsg}">Error</p>
+   </div>
 </body>
 </html>   

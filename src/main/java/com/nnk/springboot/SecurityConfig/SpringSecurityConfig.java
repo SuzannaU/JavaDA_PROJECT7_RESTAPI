@@ -27,7 +27,6 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(
                                     "/",
-                                    "/403",
                                     "/css/**")
                             .permitAll();
                     auth.requestMatchers("/user/**")

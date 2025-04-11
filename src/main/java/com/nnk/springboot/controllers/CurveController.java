@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("curvePoint")
 public class CurveController {
 
     private final CurvePointRepository curvePointRepository;
@@ -17,20 +18,20 @@ public class CurveController {
         this.curvePointRepository = curvePointRepository;
     }
 
-    @RequestMapping("/curvePoint/list")
+    @RequestMapping("list")
     public String home(Model model) {
         model.addAttribute("curvePoints", curvePointRepository.findAll());
         return "curvePoint/list";
     }
 
-    @GetMapping("/curvePoint/add")
+    @GetMapping("add")
     public String addCurveForm(Model model) {
         CurvePoint curvePoint = new CurvePoint();
         model.addAttribute("curvePoint", curvePoint);
         return "curvePoint/add";
     }
 
-    @PostMapping("/curvePoint/validate")
+    @PostMapping("validate")
     public String validate(
             @Valid @ModelAttribute("curvePoint") CurvePoint curvePoint,
             BindingResult result,
@@ -43,7 +44,7 @@ public class CurveController {
         return "redirect:/curvePoint/list";
     }
 
-    @GetMapping("/curvePoint/update/{id}")
+    @GetMapping("update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
         CurvePoint curvePoint = curvePointRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CurvePoint Id: " + id));
@@ -51,7 +52,7 @@ public class CurveController {
         return "curvePoint/update";
     }
 
-    @PostMapping("/curvePoint/update/{id}")
+    @PostMapping("update/{id}")
     public String updateCurve(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -62,7 +63,7 @@ public class CurveController {
         return "redirect:/curvePoint/list";
     }
 
-    @GetMapping("/curvePoint/delete/{id}")
+    @GetMapping("delete/{id}")
     public String deleteCurve(@PathVariable("id") Integer id, Model model) {
         CurvePoint curvePoint = curvePointRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CurvePoint Id: " + id));

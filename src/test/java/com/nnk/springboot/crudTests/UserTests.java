@@ -1,4 +1,4 @@
-package com.nnk.springboot;
+package com.nnk.springboot.crudTests;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;

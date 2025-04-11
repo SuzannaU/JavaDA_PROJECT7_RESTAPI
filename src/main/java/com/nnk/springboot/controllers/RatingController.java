@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("rating")
 public class RatingController {
 
     private final RatingRepository ratingRepository;
@@ -17,20 +18,20 @@ public class RatingController {
         this.ratingRepository = ratingRepository;
     }
 
-    @RequestMapping("/rating/list")
+    @RequestMapping("list")
     public String home(Model model) {
         model.addAttribute("ratings", ratingRepository.findAll());
         return "rating/list";
     }
 
-    @GetMapping("/rating/add")
+    @GetMapping("add")
     public String addRatingForm(Model model) {
         Rating rating = new Rating();
         model.addAttribute("rating", rating);
         return "rating/add";
     }
 
-    @PostMapping("/rating/validate")
+    @PostMapping("validate")
     public String validate(
             @Valid @ModelAttribute("rating") Rating rating,
             BindingResult result,
@@ -44,7 +45,7 @@ public class RatingController {
     }
 
 
-    @GetMapping("/rating/update/{id}")
+    @GetMapping("update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
         Rating rating = ratingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid rating Id: " + id));
@@ -52,7 +53,7 @@ public class RatingController {
         return "rating/update";
     }
 
-    @PostMapping("/rating/update/{id}")
+    @PostMapping("update/{id}")
     public String updateRating(@PathVariable("id") Integer id, @Valid Rating rating,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -63,7 +64,7 @@ public class RatingController {
         return "redirect:/rating/list";
     }
 
-    @GetMapping("/rating/delete/{id}")
+    @GetMapping("delete/{id}")
     public String deleteRating(@PathVariable("id") Integer id, Model model) {
         Rating rating = ratingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid rating Id: " + id));

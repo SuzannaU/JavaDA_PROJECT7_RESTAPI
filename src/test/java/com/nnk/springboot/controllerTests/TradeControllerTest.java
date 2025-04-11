@@ -46,8 +46,10 @@ public class TradeControllerTest {
 
     private static Stream<Arguments> invalidTradeProvider() {
         return Stream.of(
-                Arguments.of("invalidAccount", new Trade("", "type", 10d), "account"),
-                Arguments.of("invalidType", new Trade("account", "", 10d), "type"),
+                Arguments.of("nullAccount", new Trade(null, "type", 10d), "account"),
+                Arguments.of("emptyAccount", new Trade("", "type", 10d), "account"),
+                Arguments.of("nullType", new Trade("account", null, 10d), "type"),
+                Arguments.of("emptyType", new Trade("account", "", 10d), "type"),
                 Arguments.of("invalidQuantity", new Trade("account", "type", 0.1d), "buyQuantity")
         );
     }

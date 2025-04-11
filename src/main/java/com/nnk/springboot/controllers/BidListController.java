@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("bidList")
 public class BidListController {
 
     private final BidListRepository bidListRepository;
@@ -17,20 +18,20 @@ public class BidListController {
         this.bidListRepository = bidListRepository;
     }
 
-    @RequestMapping("/bidList/list")
+    @RequestMapping("list")
     public String home(Model model) {
         model.addAttribute("bidLists", bidListRepository.findAll());
         return "bidList/list";
     }
 
-    @GetMapping("/bidList/add")
+    @GetMapping("add")
     public String addBidForm(Model model) {
         BidList bidList = new BidList();
         model.addAttribute("bidList", bidList);
         return "bidList/add";
     }
 
-    @PostMapping("/bidList/validate")
+    @PostMapping("validate")
     public String validate(
             @Valid @ModelAttribute("bidList") BidList bidList,
             BindingResult result,
@@ -43,7 +44,7 @@ public class BidListController {
         return "redirect:/bidList/list";
     }
 
-    @GetMapping("/bidList/update/{id}")
+    @GetMapping("update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
         BidList bidList = bidListRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid bidList Id: " + id));
@@ -51,7 +52,7 @@ public class BidListController {
         return "bidList/update";
     }
 
-    @PostMapping("/bidList/update/{id}")
+    @PostMapping("update/{id}")
     public String updateBid(@PathVariable("id") Integer id, @Valid BidList bidList,
                             BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -62,7 +63,7 @@ public class BidListController {
         return "redirect:/bidList/list";
     }
 
-    @GetMapping("/bidList/delete/{id}")
+    @GetMapping("delete/{id}")
     public String deleteBid(@PathVariable("id") Integer id, Model model) {
         BidList bidList = bidListRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid bidList Id: " + id));
