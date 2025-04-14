@@ -65,7 +65,7 @@ public class RatingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void homeTest() throws Exception {
+    public void getHome_shouldReturnList() throws Exception {
 
         when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -80,7 +80,7 @@ public class RatingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void addBidFormTest() throws Exception {
+    public void getAddRatingForm_shouldReturnForm() throws Exception {
 
         this.mockMvc.perform(get("/rating/add"))
                 .andDo(print())
@@ -91,7 +91,7 @@ public class RatingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void validateTest() throws Exception {
+    public void postValidate_shouldSaveRating() throws Exception {
 
         when(ratingRepository.save(any())).thenReturn(validRating);
         when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
@@ -110,7 +110,7 @@ public class RatingControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidRatingProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors(String testedAttribute, Rating invalidRating, String error) throws Exception {
+    public void postValidate_withInvalidRating_shouldShowError(String testedAttribute, Rating invalidRating, String error) throws Exception {
 
         this.mockMvc.perform(post("/rating/validate")
                         .flashAttr("rating", invalidRating)
@@ -124,7 +124,7 @@ public class RatingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void showUpdateFormTest() throws Exception {
+    public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
         when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(validRating));
 
@@ -139,7 +139,7 @@ public class RatingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void updateBidTest() throws Exception {
+    public void postUpdateRating_shouldSaveRating() throws Exception {
 
         when(ratingRepository.save(any())).thenReturn(validRating);
         when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
@@ -158,7 +158,7 @@ public class RatingControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidRatingProvider")
     @WithMockUser(roles = "USER")
-    public void updateBidTest_withErrors(String testedAttribute, Rating invalidRating, String error) throws Exception {
+    public void postUpdateRating_withInvalidRating_shouldShowError(String testedAttribute, Rating invalidRating, String error) throws Exception {
 
         this.mockMvc.perform(post("/rating/update/{id}", 1)
                         .flashAttr("rating", invalidRating)
@@ -172,7 +172,7 @@ public class RatingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void deleteBidTest() throws Exception {
+    public void getDeleteRating_shouldDeleteRating() throws Exception {
 
         when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(validRating));
         doNothing().when(ratingRepository).delete(any());

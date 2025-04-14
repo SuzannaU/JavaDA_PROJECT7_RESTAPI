@@ -83,7 +83,7 @@ public class RuleNameControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void homeTest() throws Exception {
+    public void getHome_shouldReturnList() throws Exception {
 
         when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -98,7 +98,7 @@ public class RuleNameControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void addRuleFormTest() throws Exception {
+    public void getAddRuleForm_shouldReturnForm() throws Exception {
 
         this.mockMvc.perform(get("/ruleName/add"))
                 .andDo(print())
@@ -109,7 +109,7 @@ public class RuleNameControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void validateTest() throws Exception {
+    public void postValidate_shouldSaveRuleName() throws Exception {
 
         when(ruleNameRepository.save(any())).thenReturn(validRuleName);
         when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
@@ -128,7 +128,7 @@ public class RuleNameControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidRuleNameProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
+    public void postValidate_withInvalidRuleName_shouldShowError(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
 
         this.mockMvc.perform(post("/ruleName/validate")
                         .flashAttr("ruleName", invalidRuleName)
@@ -142,7 +142,7 @@ public class RuleNameControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void showUpdateFormTest() throws Exception {
+    public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
         when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(validRuleName));
 
@@ -157,7 +157,7 @@ public class RuleNameControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void updateRuleTest() throws Exception {
+    public void postUpdateRule_shouldSaveRuleName() throws Exception {
 
         when(ruleNameRepository.save(any())).thenReturn(validRuleName);
         when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
@@ -176,7 +176,7 @@ public class RuleNameControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidRuleNameProvider")
     @WithMockUser(roles = "USER")
-    public void updateRuleTest_withErrors(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
+    public void postUpdateRule_withInvalidRuleName_shouldShowError(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
 
         this.mockMvc.perform(post("/ruleName/update/{id}", 1)
                         .flashAttr("ruleName", invalidRuleName)
@@ -190,7 +190,7 @@ public class RuleNameControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void deleteRuleTest() throws Exception {
+    public void getDeleteRule_shouldDeleteRuleName() throws Exception {
 
         when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(validRuleName));
         doNothing().when(ruleNameRepository).delete(any());

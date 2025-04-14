@@ -5,41 +5,36 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 
 import java.sql.Timestamp;
-//import javax.persistence.*;
-//import javax.validation.constraints.NotBlank;
-//import java.sql.Timestamp;
-
 
 @Entity
 @Table(name = "trade")
 public class Trade {
-    // TODO: Map columns in data table TRADE with corresponding java fields
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="TradeId")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "TradeId")
     private Integer tradeId;
 
-    @NotBlank(message="Account is mandatory")
+    @NotBlank(message = "Account is mandatory")
     private String account;
 
-    @NotBlank(message="Type is mandatory")
+    @NotBlank(message = "Type is mandatory")
     private String type;
 
     @DecimalMin(value = "1.0", message = "Buy Quantity must be at least 1.0")
-    @Column(name="buyQuantity")
+    @Column(name = "buyQuantity")
     private double buyQuantity;
 
-    @Column(name="sellQuantity")
+    @Column(name = "sellQuantity")
     private double sellQuantity;
 
-    @Column(name="buyPrice")
+    @Column(name = "buyPrice")
     private double buyPrice;
 
-    @Column(name="sellPrice")
+    @Column(name = "sellPrice")
     private double sellPrice;
 
-    @Column(name="tradeDate")
+    @Column(name = "tradeDate")
     private Timestamp tradeDate;
 
     private String security;
@@ -48,25 +43,25 @@ public class Trade {
     private String benchmark;
     private String book;
 
-    @Column(name="creationName")
+    @Column(name = "creationName")
     private String creationName;
 
-    @Column(name="creationDate")
+    @Column(name = "creationDate")
     private Timestamp creationDate;
 
-    @Column(name="revisionName")
+    @Column(name = "revisionName")
     private String revisionName;
 
-    @Column(name="revisionDate")
+    @Column(name = "revisionDate")
     private Timestamp revisionDate;
 
-    @Column(name="dealName")
+    @Column(name = "dealName")
     private String dealName;
 
-    @Column(name="dealType")
+    @Column(name = "dealType")
     private String dealType;
 
-    @Column(name="sourceListId")
+    @Column(name = "sourceListId")
     private String sourceListId;
 
     private String side;

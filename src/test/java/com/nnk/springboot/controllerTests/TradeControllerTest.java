@@ -63,7 +63,7 @@ public class TradeControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void homeTest() throws Exception {
+    public void getHome_shouldReturnList() throws Exception {
 
         when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -78,7 +78,7 @@ public class TradeControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void addTradeFormTest() throws Exception {
+    public void getAddTradeForm_shouldReturnForm() throws Exception {
 
         this.mockMvc.perform(get("/trade/add"))
                 .andDo(print())
@@ -89,7 +89,7 @@ public class TradeControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void validateTest() throws Exception {
+    public void postValidate_shouldSaveTrade() throws Exception {
 
         when(tradeRepository.save(any())).thenReturn(validTrade);
         when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
@@ -108,7 +108,7 @@ public class TradeControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidTradeProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors(String testedAttribute, Trade invalidTrade, String error) throws Exception {
+    public void postValidate_withInvalidTrade_shouldShowError(String testedAttribute, Trade invalidTrade, String error) throws Exception {
 
         this.mockMvc.perform(post("/trade/validate")
                         .flashAttr("trade", invalidTrade)
@@ -122,7 +122,7 @@ public class TradeControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void showUpdateFormTest() throws Exception {
+    public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
         when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(validTrade));
 
@@ -137,7 +137,7 @@ public class TradeControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void updateTradeTest() throws Exception {
+    public void postUpdateTrade_shouldSaveBidList() throws Exception {
 
         when(tradeRepository.save(any())).thenReturn(validTrade);
         when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
@@ -156,7 +156,7 @@ public class TradeControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidTradeProvider")
     @WithMockUser(roles = "USER")
-    public void updateTradeTest_withErrors(String testedAttribute, Trade invalidTrade, String error) throws Exception {
+    public void postUpdateTrade_withInvalidTrade_shouldShowError(String testedAttribute, Trade invalidTrade, String error) throws Exception {
 
         this.mockMvc.perform(post("/trade/update/{id}", 1)
                         .flashAttr("trade", invalidTrade)
@@ -170,7 +170,7 @@ public class TradeControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void deleteTradeTest() throws Exception {
+    public void getDeleteTrade_shouldDeleteTrade() throws Exception {
 
         when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(validTrade));
         doNothing().when(tradeRepository).delete(any());

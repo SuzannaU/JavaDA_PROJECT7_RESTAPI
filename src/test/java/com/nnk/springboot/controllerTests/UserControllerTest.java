@@ -71,7 +71,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void homeTest() throws Exception {
+    public void getHome_shouldReturnList() throws Exception {
 
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -86,7 +86,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void addUserFormTest() throws Exception {
+    public void getAddUserForm_shouldReturnForm() throws Exception {
 
         this.mockMvc.perform(get("/user/add"))
                 .andDo(print())
@@ -97,7 +97,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void validateTest() throws Exception {
+    public void postValidate_shouldSaveUser() throws Exception {
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any())).thenReturn(validUser);
@@ -118,7 +118,7 @@ public class UserControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"nouppercase1&", "NoDigits&", "NoSymbol123", "Under8&"})
     @WithMockUser(roles = "ADMIN")
-    public void passwordValidationTest(String invalidPassword) throws Exception {
+    public void postValidateUpdate_withInvalidPassword_shouldShowError(String invalidPassword) throws Exception {
         User invalidUser = new User("username", "", "fullname", "role");
         invalidUser.setPassword(invalidPassword);
 
@@ -144,7 +144,7 @@ public class UserControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidUserProvider")
     @WithMockUser(roles = "ADMIN")
-    public void validateTest_withErrors(String testedAttribute, User invalidUser, String error) throws Exception {
+    public void postValidate_withInvalidUser_shouldShowError(String testedAttribute, User invalidUser, String error) throws Exception {
 
         this.mockMvc.perform(post("/user/validate")
                         .flashAttr("user", invalidUser)
@@ -158,7 +158,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void showUpdateFormTest() throws Exception {
+    public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
 
@@ -173,7 +173,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void updateUserTest() throws Exception {
+    public void postUpdateUser_shouldSaveUser() throws Exception {
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any())).thenReturn(validUser);
@@ -194,7 +194,7 @@ public class UserControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidUserProvider")
     @WithMockUser(roles = "ADMIN")
-    public void updateUserTest_withErrors(String testedAttribute, User invalidUser, String error) throws Exception {
+    public void postUpdateUser_withInvalidUser_shouldShowError(String testedAttribute, User invalidUser, String error) throws Exception {
 
         this.mockMvc.perform(post("/user/update/{id}", 1)
                         .flashAttr("user", invalidUser)
@@ -208,7 +208,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void deleteUserTest() throws Exception {
+    public void getDeleteUser_shouldDeleteUser() throws Exception {
 
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
         doNothing().when(userRepository).delete(any(User.class));

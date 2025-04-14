@@ -2,9 +2,8 @@ package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "curvepoint")
@@ -12,14 +11,14 @@ public class CurvePoint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Integer id;
 
-    //@NotNull(message = "must not be null")
-    @Column(name="curveId")
+    @DecimalMin(value = "1", message = "Term must be at least 1")
+    @Column(name = "curveId")
     private int curveId;
 
-    @Column(name="asOfDate")
+    @Column(name = "asOfDate")
     private Timestamp asOfDate;
 
     @DecimalMin(value = "1.0", message = "Term must be at least 1.0")
@@ -28,7 +27,7 @@ public class CurvePoint {
     @DecimalMin(value = "1.0", message = "Value must be at least 1.0")
     private double value;
 
-    @Column(name="creationDate")
+    @Column(name = "creationDate")
     private Timestamp creationDate;
 
     public CurvePoint(double term, double value) {

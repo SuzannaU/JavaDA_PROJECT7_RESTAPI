@@ -63,7 +63,7 @@ public class BidListControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void homeTest() throws Exception {
+    public void getHome_shouldReturnList() throws Exception {
 
         when(bidListRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -78,7 +78,7 @@ public class BidListControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void addBidFormTest() throws Exception {
+    public void getAddBidForm_shouldReturnForm() throws Exception {
 
         this.mockMvc.perform(get("/bidList/add"))
                 .andDo(print())
@@ -89,7 +89,7 @@ public class BidListControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void validateTest() throws Exception {
+    public void postValidate_shouldSaveBidList() throws Exception {
 
         when(bidListRepository.save(any())).thenReturn(validBidList);
         when(bidListRepository.findAll()).thenReturn(new ArrayList<>());
@@ -108,7 +108,7 @@ public class BidListControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidBidListProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors(String testedAttribute, BidList invalidBidList, String error) throws Exception {
+    public void postValidate_withInvalidBidList_shouldShowError(String testedAttribute, BidList invalidBidList, String error) throws Exception {
 
         this.mockMvc.perform(post("/bidList/validate")
                         .flashAttr("bidList", invalidBidList)
@@ -122,7 +122,7 @@ public class BidListControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void showUpdateFormTest() throws Exception {
+    public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
         when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(validBidList));
 
@@ -137,7 +137,7 @@ public class BidListControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void updateBidTest() throws Exception {
+    public void postUpdateBid_shouldSaveBidList() throws Exception {
 
         when(bidListRepository.save(any())).thenReturn(validBidList);
         when(bidListRepository.findAll()).thenReturn(new ArrayList<>());
@@ -156,7 +156,7 @@ public class BidListControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidBidListProvider")
     @WithMockUser(roles = "USER")
-    public void updateBidTest_withErrors(String testedAttribute, BidList invalidBidList, String error) throws Exception {
+    public void postUpdateBid_withInvalidBidList_shouldShowError(String testedAttribute, BidList invalidBidList, String error) throws Exception {
 
         this.mockMvc.perform(post("/bidList/update/{id}", 1)
                         .flashAttr("bidList", invalidBidList)
@@ -170,7 +170,7 @@ public class BidListControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void deleteBidTest() throws Exception {
+    public void getDeleteBid_shouldDeleteBidList() throws Exception {
 
         when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(validBidList));
         doNothing().when(bidListRepository).delete(any());

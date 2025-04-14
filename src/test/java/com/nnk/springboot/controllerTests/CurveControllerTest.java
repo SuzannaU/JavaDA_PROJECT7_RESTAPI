@@ -60,7 +60,7 @@ public class CurveControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void homeTest() throws Exception {
+    public void getHome_shouldReturnList() throws Exception {
 
         when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -75,7 +75,7 @@ public class CurveControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void addCurveFormTest() throws Exception {
+    public void getAddCurveForm_shouldReturnForm() throws Exception {
 
         this.mockMvc.perform(get("/curvePoint/add"))
                 .andDo(print())
@@ -86,7 +86,7 @@ public class CurveControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void validateTest() throws Exception {
+    public void postValidate_shouldSaveCurvePoint() throws Exception {
 
         when(curvePointRepository.save(any())).thenReturn(validCurvePoint);
         when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
@@ -105,7 +105,7 @@ public class CurveControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidCurvePointProvider")
     @WithMockUser(roles = "USER")
-    public void validateTest_withErrors(String testedAttribute, CurvePoint invalidCurvePoint, String error) throws Exception {
+    public void postValidate_withInvalidCurvePoint_shouldShowError(String testedAttribute, CurvePoint invalidCurvePoint, String error) throws Exception {
 
         this.mockMvc.perform(post("/curvePoint/validate")
                         .flashAttr("curvePoint", invalidCurvePoint)
@@ -119,7 +119,7 @@ public class CurveControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void showUpdateFormTest() throws Exception {
+    public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
         when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(validCurvePoint));
 
@@ -134,7 +134,7 @@ public class CurveControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void updateCurveTest() throws Exception {
+    public void postUpdateCurve_shouldSaveCurvePoint() throws Exception {
 
         when(curvePointRepository.save(any())).thenReturn(validCurvePoint);
         when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
@@ -153,7 +153,7 @@ public class CurveControllerTest {
     @ParameterizedTest(name = "{0} should return {2} error")
     @MethodSource("invalidCurvePointProvider")
     @WithMockUser(roles = "USER")
-    public void updateCurveTest_withErrors(String testedAttribute, CurvePoint invalidCurvePoint, String error) throws Exception {
+    public void postUpdateCurve_withInvalidCurvePoint_shouldShowError(String testedAttribute, CurvePoint invalidCurvePoint, String error) throws Exception {
 
         this.mockMvc.perform(post("/curvePoint/update/{id}", 1)
                         .flashAttr("curvePoint", invalidCurvePoint)
@@ -167,7 +167,7 @@ public class CurveControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void deleteCurveTest() throws Exception {
+    public void getDeleteCurve_shouldDeleteCurvePoint() throws Exception {
 
         when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(validCurvePoint));
         doNothing().when(curvePointRepository).delete(any());
