@@ -1,6 +1,6 @@
 package com.nnk.springboot.controllerTests;
 
-import com.nnk.springboot.SecurityConfig.SpringSecurityConfig;
+import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.TradeController;
 import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.repositories.TradeRepository;

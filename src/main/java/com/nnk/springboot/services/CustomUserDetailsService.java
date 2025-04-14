@@ -24,6 +24,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Users are logged in with username.
+     * Method is used by Spring Security during login process.
+     *
+     * @param username identifying the user
+     * @return UserDetails
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> optUser = userRepository.findByUsername(username);

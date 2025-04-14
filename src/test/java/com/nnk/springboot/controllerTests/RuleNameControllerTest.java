@@ -1,6 +1,6 @@
 package com.nnk.springboot.controllerTests;
 
-import com.nnk.springboot.SecurityConfig.SpringSecurityConfig;
+import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.RuleNameController;
 import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.repositories.RuleNameRepository;
