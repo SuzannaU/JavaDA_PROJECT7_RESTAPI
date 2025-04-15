@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "bidlist")
-public class BidList {
+public class Bid {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,13 +66,13 @@ public class BidList {
 
     private String side;
 
-    public BidList(String account, String type, double bidQuantity) {
+    public Bid(String account, String type, double bidQuantity) {
         this.account = account;
         this.type = type;
         this.bidQuantity = bidQuantity;
     }
 
-    public BidList() {
+    public Bid() {
     }
 
     public Integer getBidListId() {

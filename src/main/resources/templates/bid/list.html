@@ -10,7 +10,7 @@
 <div class="container">
     <div class="row">
         <div class="col-6">
-            <a href="/bidList/list">Bid List</a>&nbsp;|&nbsp;
+            <a href="/bid/list">Bid List</a>&nbsp;|&nbsp;
             <a href="/curvePoint/list">Curve Points</a>&nbsp;|&nbsp;
             <a href="/rating/list">Ratings</a>&nbsp;|&nbsp;
             <a href="/trade/list">Trade</a>&nbsp;|&nbsp;
@@ -25,7 +25,7 @@
     </div>
     <div class="row"><h2>Bid List</h2></div>
     <div class="row">
-        <a href="/bidList/add" class="btn btn-primary btn-sm">Add New</a>
+        <a href="/bid/add" class="btn btn-primary btn-sm">Add New</a>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -37,14 +37,14 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="bidList : ${bidLists}">
-                <td style="width: 10%" th:text="${bidList.bidListId}"></td>
-                <td th:text="${bidList.account}"></td>
-                <td th:text="${bidList.type}"></td>
-                <td th:text="${bidList.bidQuantity}"></td>
+            <tr th:each="bid : ${bids}">
+                <td style="width: 10%" th:text="${bid.bidListId}"></td>
+                <td th:text="${bid.account}"></td>
+                <td th:text="${bid.type}"></td>
+                <td th:text="${bid.bidQuantity}"></td>
                 <td style="width: 15%" class="text-center">
-                    <a th:href="@{/bidList/update/{id}(id=${bidList.bidListId})}">Edit</a>&nbsp;|&nbsp;
-                    <a th:href="@{/bidList/delete/{id}(id=${bidList.bidListId})}">Delete</a>
+                    <a th:href="@{/bid/update/{id}(id=${bid.bidListId})}">Edit</a>&nbsp;|&nbsp;
+                    <a th:href="@{/bid/delete/{id}(id=${bid.bidListId})}">Delete</a>
                 </td>
             </tr>
             </tbody>

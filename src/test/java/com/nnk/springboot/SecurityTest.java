@@ -48,7 +48,7 @@ public class SecurityTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/bidList/add", "/bidList/list", "/bidList/update"})
+    @ValueSource(strings = {"/bid/add", "/bid/list", "/bid/update"})
     @WithAnonymousUser
     public void anonymousUser_isUnauthorizedTest(String url) throws Exception {
         mockMvc.perform(get(url))
