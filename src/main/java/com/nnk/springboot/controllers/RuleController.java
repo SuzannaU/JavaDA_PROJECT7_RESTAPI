@@ -1,7 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rule;
-import com.nnk.springboot.repositories.RuleRepository;
+import com.nnk.springboot.services.RuleService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("rule")
 public class RuleController {
 
-    private final RuleRepository ruleRepository;
+    private final RuleService ruleService;
 
-    public RuleController(RuleRepository ruleRepository) {
-        this.ruleRepository = ruleRepository;
+    public RuleController(RuleService ruleService) {
+        this.ruleService = ruleService;
     }
 
     @RequestMapping("list")
     public String home(Model model) {
-        model.addAttribute("rules", ruleRepository.findAll());
+        model.addAttribute("rules", ruleService.findAll());
         return "rule/list";
     }
 
@@ -39,36 +39,34 @@ public class RuleController {
         if (result.hasErrors()) {
             return "rule/add";
         }
-        ruleRepository.save(rule);
-        model.addAttribute("rules", ruleRepository.findAll());
+        ruleService.save(rule);
+        model.addAttribute("rules", ruleService.findAll());
         return "redirect:/rule/list";
     }
 
     @GetMapping("update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        Rule rule = ruleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Rule Id: " + id));
+        Rule rule = ruleService.findById(id);
         model.addAttribute("rule", rule);
         return "rule/update";
     }
 
     @PostMapping("update/{id}")
     public String updateRule(@PathVariable("id") Integer id, @Valid Rule rule,
-                                 BindingResult result, Model model) {
+                             BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "rule/update";
         }
-        ruleRepository.save(rule);
-        model.addAttribute("rules", ruleRepository.findAll());
+        ruleService.save(rule);
+        model.addAttribute("rules", ruleService.findAll());
         return "redirect:/rule/list";
     }
 
     @GetMapping("delete/{id}")
     public String deleteRule(@PathVariable("id") Integer id, Model model) {
-        Rule rule = ruleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Rule Id: " + id));
-        ruleRepository.delete(rule);
-        model.addAttribute("rules", ruleRepository.findAll());
+        Rule rule = ruleService.findById(id);
+        ruleService.delete(rule);
+        model.addAttribute("rules", ruleService.findAll());
         return "redirect:/rule/list";
     }
 }

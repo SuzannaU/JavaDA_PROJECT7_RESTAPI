@@ -1,7 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Trade;
-import com.nnk.springboot.repositories.TradeRepository;
+import com.nnk.springboot.services.TradeService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("trade")
 public class TradeController {
 
-    private final TradeRepository tradeRepository;
+    private final TradeService tradeService;
 
-    public TradeController(TradeRepository tradeRepository) {
-        this.tradeRepository = tradeRepository;
+    public TradeController(TradeService tradeService) {
+        this.tradeService = tradeService;
     }
 
     @RequestMapping("list")
     public String home(Model model) {
-        model.addAttribute("trades", tradeRepository.findAll());
+        model.addAttribute("trades", tradeService.findAll());
         return "trade/list";
     }
 
@@ -39,15 +39,14 @@ public class TradeController {
         if (result.hasErrors()) {
             return "trade/add";
         }
-        tradeRepository.save(trade);
-        model.addAttribute("trades", tradeRepository.findAll());
+        tradeService.save(trade);
+        model.addAttribute("trades", tradeService.findAll());
         return "redirect:/trade/list";
     }
 
     @GetMapping("update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        Trade trade = tradeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Trade Id: " + id));
+        Trade trade = tradeService.findById(id);
         model.addAttribute("trade", trade);
         return "trade/update";
     }
@@ -58,17 +57,16 @@ public class TradeController {
         if (result.hasErrors()) {
             return "trade/update";
         }
-        tradeRepository.save(trade);
-        model.addAttribute("trades", tradeRepository.findAll());
+        tradeService.save(trade);
+        model.addAttribute("trades", tradeService.findAll());
         return "redirect:/trade/list";
     }
 
     @GetMapping("delete/{id}")
     public String deleteTrade(@PathVariable("id") Integer id, Model model) {
-        Trade trade = tradeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Trade Id: " + id));
-        tradeRepository.delete(trade);
-        model.addAttribute("trades", tradeRepository.findAll());
+        Trade trade = tradeService.findById(id);
+        tradeService.delete(trade);
+        model.addAttribute("trades", tradeService.findAll());
         return "redirect:/trade/list";
     }
 }
