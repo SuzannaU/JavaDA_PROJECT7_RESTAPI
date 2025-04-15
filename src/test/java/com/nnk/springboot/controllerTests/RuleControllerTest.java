@@ -1,9 +1,9 @@
 package com.nnk.springboot.controllerTests;
 
 import com.nnk.springboot.config.SpringSecurityConfig;
-import com.nnk.springboot.controllers.RuleNameController;
-import com.nnk.springboot.domain.RuleName;
-import com.nnk.springboot.repositories.RuleNameRepository;
+import com.nnk.springboot.controllers.RuleController;
+import com.nnk.springboot.domain.Rule;
+import com.nnk.springboot.repositories.RuleRepository;
 import com.nnk.springboot.services.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(RuleNameController.class)
+@WebMvcTest(RuleController.class)
 @Import({SpringSecurityConfig.class})
-public class RuleNameControllerTest {
+public class RuleControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,41 +42,41 @@ public class RuleNameControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private RuleNameRepository ruleNameRepository;
+    private RuleRepository ruleRepository;
 
-    private RuleName validRuleName;
+    private Rule validRule;
 
     @BeforeEach
     public void setup() {
-        validRuleName = new RuleName(
+        validRule = new Rule(
                 "name", "description", "json", "template", "sqlStr", "sqlPart");
     }
 
-    private static Stream<Arguments> invalidRuleNameProvider() {
+    private static Stream<Arguments> invalidRuleProvider() {
         return Stream.of(
-                Arguments.of("nullName", new RuleName(
+                Arguments.of("nullName", new Rule(
                         null, "description", "json", "template", "sqlStr", "sqlPart"), "name"),
-                Arguments.of("emptyName", new RuleName(
+                Arguments.of("emptyName", new Rule(
                         "", "description", "json", "template", "sqlStr", "sqlPart"), "name"),
-                Arguments.of("nullDescription", new RuleName(
+                Arguments.of("nullDescription", new Rule(
                         "name", null, "json", "template", "sqlStr", "sqlPart"), "description"),
-                Arguments.of("emptyDescription", new RuleName(
+                Arguments.of("emptyDescription", new Rule(
                         "name", "", "json", "template", "sqlStr", "sqlPart"), "description"),
-                Arguments.of("nullJson", new RuleName(
+                Arguments.of("nullJson", new Rule(
                         "name", "description", null, "template", "sqlStr", "sqlPart"), "json"),
-                Arguments.of("emptyJson", new RuleName(
+                Arguments.of("emptyJson", new Rule(
                         "name", "description", "", "template", "sqlStr", "sqlPart"), "json"),
-                Arguments.of("nullTemplate", new RuleName(
+                Arguments.of("nullTemplate", new Rule(
                         "name", "description", "json", null, "sqlStr", "sqlPart"), "template"),
-                Arguments.of("emptyTemplate", new RuleName(
+                Arguments.of("emptyTemplate", new Rule(
                         "name", "description", "json", "", "sqlStr", "sqlPart"), "template"),
-                Arguments.of("nullSqlStr", new RuleName(
+                Arguments.of("nullSqlStr", new Rule(
                         "name", "description", "json", "template", null, "sqlPart"), "sqlStr"),
-                Arguments.of("emptySqlStr", new RuleName(
+                Arguments.of("emptySqlStr", new Rule(
                         "name", "description", "json", "template", "", "sqlPart"), "sqlStr"),
-                Arguments.of("nullSqlPart", new RuleName(
+                Arguments.of("nullSqlPart", new Rule(
                         "name", "description", "json", "template", "sqlStr", null), "sqlPart"),
-                Arguments.of("emptySqlPart", new RuleName(
+                Arguments.of("emptySqlPart", new Rule(
                         "name", "description", "json", "template", "sqlStr", ""), "sqlPart")
         );
     }
@@ -85,124 +85,124 @@ public class RuleNameControllerTest {
     @WithMockUser(roles = "USER")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
 
-        this.mockMvc.perform(get("/ruleName/list"))
+        this.mockMvc.perform(get("/rule/list"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/list"))
+                .andExpect(view().name("rule/list"))
                 .andExpect(content().string(containsString("Rule List")));
 
-        verify(ruleNameRepository).findAll();
+        verify(ruleRepository).findAll();
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void getAddRuleForm_shouldReturnForm() throws Exception {
 
-        this.mockMvc.perform(get("/ruleName/add"))
+        this.mockMvc.perform(get("/rule/add"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
+                .andExpect(view().name("rule/add"))
                 .andExpect(content().string(containsString("Add New Rule")));
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    public void postValidate_shouldSaveRuleName() throws Exception {
+    public void postValidate_shouldSaveRule() throws Exception {
 
-        when(ruleNameRepository.save(any())).thenReturn(validRuleName);
-        when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleRepository.save(any())).thenReturn(validRule);
+        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
 
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", validRuleName)
+        this.mockMvc.perform(post("/rule/validate")
+                        .flashAttr("rule", validRule)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/ruleName/list"));
+                .andExpect(redirectedUrl("/rule/list"));
 
-        verify(ruleNameRepository).save(any());
-        verify(ruleNameRepository).findAll();
+        verify(ruleRepository).save(any());
+        verify(ruleRepository).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
-    @MethodSource("invalidRuleNameProvider")
+    @MethodSource("invalidRuleProvider")
     @WithMockUser(roles = "USER")
-    public void postValidate_withInvalidRuleName_shouldShowError(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
+    public void postValidate_withInvalidRuleName_shouldShowError(String testedAttribute, Rule invalidRule, String error) throws Exception {
 
-        this.mockMvc.perform(post("/ruleName/validate")
-                        .flashAttr("ruleName", invalidRuleName)
+        this.mockMvc.perform(post("/rule/validate")
+                        .flashAttr("rule", invalidRule)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/add"))
+                .andExpect(view().name("rule/add"))
                 .andExpect(content().string(containsString("Add New Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", error));
+                .andExpect(model().attributeHasFieldErrors("rule", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(validRuleName));
+        when(ruleRepository.findById(anyInt())).thenReturn(Optional.of(validRule));
 
-        this.mockMvc.perform(get("/ruleName/update/{id}", 1))
+        this.mockMvc.perform(get("/rule/update/{id}", 1))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
+                .andExpect(view().name("rule/update"))
                 .andExpect(content().string(containsString("Update Rule")));
 
-        verify(ruleNameRepository).findById(1);
+        verify(ruleRepository).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    public void postUpdateRule_shouldSaveRuleName() throws Exception {
+    public void postUpdateRule_shouldSaveRule() throws Exception {
 
-        when(ruleNameRepository.save(any())).thenReturn(validRuleName);
-        when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleRepository.save(any())).thenReturn(validRule);
+        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
 
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", validRuleName)
+        this.mockMvc.perform(post("/rule/update/{id}", 1)
+                        .flashAttr("rule", validRule)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/ruleName/list"));
+                .andExpect(redirectedUrl("/rule/list"));
 
-        verify(ruleNameRepository).save(any());
-        verify(ruleNameRepository).findAll();
+        verify(ruleRepository).save(any());
+        verify(ruleRepository).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
-    @MethodSource("invalidRuleNameProvider")
+    @MethodSource("invalidRuleProvider")
     @WithMockUser(roles = "USER")
-    public void postUpdateRule_withInvalidRuleName_shouldShowError(String testedAttribute, RuleName invalidRuleName, String error) throws Exception {
+    public void postUpdateRule_withInvalidRule_shouldShowError(String testedAttribute, Rule invalidRule, String error) throws Exception {
 
-        this.mockMvc.perform(post("/ruleName/update/{id}", 1)
-                        .flashAttr("ruleName", invalidRuleName)
+        this.mockMvc.perform(post("/rule/update/{id}", 1)
+                        .flashAttr("rule", invalidRule)
                         .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("ruleName/update"))
+                .andExpect(view().name("rule/update"))
                 .andExpect(content().string(containsString("Update Rule")))
-                .andExpect(model().attributeHasFieldErrors("ruleName", error));
+                .andExpect(model().attributeHasFieldErrors("rule", error));
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    public void getDeleteRule_shouldDeleteRuleName() throws Exception {
+    public void getDeleteRule_shouldDeleteRule() throws Exception {
 
-        when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(validRuleName));
-        doNothing().when(ruleNameRepository).delete(any());
-        when(ruleNameRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleRepository.findById(anyInt())).thenReturn(Optional.of(validRule));
+        doNothing().when(ruleRepository).delete(any());
+        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
 
-        this.mockMvc.perform(get("/ruleName/delete/{id}", 1))
+        this.mockMvc.perform(get("/rule/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/ruleName/list"));
+                .andExpect(redirectedUrl("/rule/list"));
 
-        verify(ruleNameRepository).findById(1);
-        verify(ruleNameRepository).delete(any());
-        verify(ruleNameRepository).findAll();
+        verify(ruleRepository).findById(1);
+        verify(ruleRepository).delete(any());
+        verify(ruleRepository).findAll();
     }
 }

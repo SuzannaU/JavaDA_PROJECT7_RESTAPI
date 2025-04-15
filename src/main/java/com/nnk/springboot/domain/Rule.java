@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "rulename")
-public class RuleName {
+public class Rule {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class RuleName {
     @Column(name="sqlPart")
     private String sqlPart;
 
-    public RuleName(String name, String description, String json, String template, String sqlStr, String sqlPart) {
+    public Rule(String name, String description, String json, String template, String sqlStr, String sqlPart) {
         this.name = name;
         this.description = description;
         this.json = json;
@@ -41,7 +41,7 @@ public class RuleName {
         this.sqlPart = sqlPart;
     }
 
-    public RuleName() {
+    public Rule() {
     }
 
     public Integer getId() {
