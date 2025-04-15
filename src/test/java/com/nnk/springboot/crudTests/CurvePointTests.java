@@ -20,7 +20,7 @@ public class CurvePointTests {
 
 	@Test
 	public void curvePointTest() {
-		CurvePoint curvePoint = new CurvePoint(10d, 10d);
+		CurvePoint curvePoint = new CurvePoint(1, 10d, 10d);
 
 		// Save
 		curvePoint = curvePointRepository.save(curvePoint);

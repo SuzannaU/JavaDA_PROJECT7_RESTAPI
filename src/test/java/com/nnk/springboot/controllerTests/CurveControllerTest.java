@@ -3,7 +3,7 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.CurveController;
 import com.nnk.springboot.domain.CurvePoint;
-import com.nnk.springboot.repositories.CurvePointRepository;
+import com.nnk.springboot.services.CurvePointService;
 import com.nnk.springboot.services.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
@@ -42,19 +41,20 @@ public class CurveControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private CurvePointRepository curvePointRepository;
+    private CurvePointService curvePointService;
 
     private CurvePoint validCurvePoint;
 
     @BeforeEach
     public void setup() {
-        validCurvePoint = new CurvePoint(10d, 10d);
+        validCurvePoint = new CurvePoint(1, 10d, 10d);
     }
 
     private static Stream<Arguments> invalidCurvePointProvider() {
         return Stream.of(
-                Arguments.of("invalidTerm", new CurvePoint(0, 10d), "term"),
-                Arguments.of("invalidValue", new CurvePoint(10d, 0), "value")
+                Arguments.of("invalidCurveId", new CurvePoint(0, 10d, 10d), "curveId"),
+                Arguments.of("invalidTerm", new CurvePoint(1, 0.9, 10d), "term"),
+                Arguments.of("invalidValue", new CurvePoint(1, 10d, 0.9), "value")
         );
     }
 
@@ -62,7 +62,7 @@ public class CurveControllerTest {
     @WithMockUser(roles = "USER")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
+        when(curvePointService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/curvePoint/list"))
                 .andDo(print())
@@ -70,7 +70,7 @@ public class CurveControllerTest {
                 .andExpect(view().name("curvePoint/list"))
                 .andExpect(content().string(containsString("Curve Point List")));
 
-        verify(curvePointRepository).findAll();
+        verify(curvePointService).findAll();
     }
 
     @Test
@@ -88,8 +88,8 @@ public class CurveControllerTest {
     @WithMockUser(roles = "USER")
     public void postValidate_shouldSaveCurvePoint() throws Exception {
 
-        when(curvePointRepository.save(any())).thenReturn(validCurvePoint);
-        when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
+        when(curvePointService.save(any())).thenReturn(validCurvePoint);
+        when(curvePointService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/curvePoint/validate")
                         .flashAttr("curvePoint", validCurvePoint)
@@ -98,8 +98,8 @@ public class CurveControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/curvePoint/list"));
 
-        verify(curvePointRepository).save(any());
-        verify(curvePointRepository).findAll();
+        verify(curvePointService).save(any());
+        verify(curvePointService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -121,7 +121,7 @@ public class CurveControllerTest {
     @WithMockUser(roles = "USER")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(validCurvePoint));
+        when(curvePointService.findById(anyInt())).thenReturn(validCurvePoint);
 
         this.mockMvc.perform(get("/curvePoint/update/{id}", 1))
                 .andDo(print())
@@ -129,15 +129,15 @@ public class CurveControllerTest {
                 .andExpect(view().name("curvePoint/update"))
                 .andExpect(content().string(containsString("Update CurvePoint")));
 
-        verify(curvePointRepository).findById(1);
+        verify(curvePointService).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void postUpdateCurve_shouldSaveCurvePoint() throws Exception {
 
-        when(curvePointRepository.save(any())).thenReturn(validCurvePoint);
-        when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
+        when(curvePointService.save(any())).thenReturn(validCurvePoint);
+        when(curvePointService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/curvePoint/update/{id}", 1)
                         .flashAttr("curvePoint", validCurvePoint)
@@ -146,8 +146,8 @@ public class CurveControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/curvePoint/list"));
 
-        verify(curvePointRepository).save(any());
-        verify(curvePointRepository).findAll();
+        verify(curvePointService).save(any());
+        verify(curvePointService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -169,18 +169,18 @@ public class CurveControllerTest {
     @WithMockUser(roles = "USER")
     public void getDeleteCurve_shouldDeleteCurvePoint() throws Exception {
 
-        when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(validCurvePoint));
-        doNothing().when(curvePointRepository).delete(any());
-        when(curvePointRepository.findAll()).thenReturn(new ArrayList<>());
+        when(curvePointService.findById(anyInt())).thenReturn(validCurvePoint);
+        doNothing().when(curvePointService).delete(any());
+        when(curvePointService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/curvePoint/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/curvePoint/list"));
 
-        verify(curvePointRepository).findById(1);
-        verify(curvePointRepository).delete(any());
-        verify(curvePointRepository).findAll();
+        verify(curvePointService).findById(1);
+        verify(curvePointService).delete(any());
+        verify(curvePointService).findAll();
     }
 
 }

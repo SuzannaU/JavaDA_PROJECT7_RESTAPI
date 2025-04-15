@@ -3,8 +3,8 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.TradeController;
 import com.nnk.springboot.domain.Trade;
-import com.nnk.springboot.repositories.TradeRepository;
 import com.nnk.springboot.services.CustomUserDetailsService;
+import com.nnk.springboot.services.TradeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
@@ -42,7 +41,7 @@ public class TradeControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private TradeRepository tradeRepository;
+    private TradeService tradeService;
 
     private Trade validTrade;
 
@@ -65,7 +64,7 @@ public class TradeControllerTest {
     @WithMockUser(roles = "USER")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
+        when(tradeService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/trade/list"))
                 .andDo(print())
@@ -73,7 +72,7 @@ public class TradeControllerTest {
                 .andExpect(view().name("trade/list"))
                 .andExpect(content().string(containsString("Trade List")));
 
-        verify(tradeRepository).findAll();
+        verify(tradeService).findAll();
     }
 
     @Test
@@ -91,8 +90,8 @@ public class TradeControllerTest {
     @WithMockUser(roles = "USER")
     public void postValidate_shouldSaveTrade() throws Exception {
 
-        when(tradeRepository.save(any())).thenReturn(validTrade);
-        when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
+        when(tradeService.save(any())).thenReturn(validTrade);
+        when(tradeService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/trade/validate")
                         .flashAttr("trade", validTrade)
@@ -101,8 +100,8 @@ public class TradeControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/trade/list"));
 
-        verify(tradeRepository).save(any());
-        verify(tradeRepository).findAll();
+        verify(tradeService).save(any());
+        verify(tradeService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -124,7 +123,7 @@ public class TradeControllerTest {
     @WithMockUser(roles = "USER")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(validTrade));
+        when(tradeService.findById(anyInt())).thenReturn(validTrade);
 
         this.mockMvc.perform(get("/trade/update/{id}", 1))
                 .andDo(print())
@@ -132,15 +131,15 @@ public class TradeControllerTest {
                 .andExpect(view().name("trade/update"))
                 .andExpect(content().string(containsString("Update Trade")));
 
-        verify(tradeRepository).findById(1);
+        verify(tradeService).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void postUpdateTrade_shouldSaveBidList() throws Exception {
 
-        when(tradeRepository.save(any())).thenReturn(validTrade);
-        when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
+        when(tradeService.save(any())).thenReturn(validTrade);
+        when(tradeService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/trade/update/{id}", 1)
                         .flashAttr("trade", validTrade)
@@ -149,8 +148,8 @@ public class TradeControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/trade/list"));
 
-        verify(tradeRepository).save(any());
-        verify(tradeRepository).findAll();
+        verify(tradeService).save(any());
+        verify(tradeService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -172,17 +171,17 @@ public class TradeControllerTest {
     @WithMockUser(roles = "USER")
     public void getDeleteTrade_shouldDeleteTrade() throws Exception {
 
-        when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(validTrade));
-        doNothing().when(tradeRepository).delete(any());
-        when(tradeRepository.findAll()).thenReturn(new ArrayList<>());
+        when(tradeService.findById(anyInt())).thenReturn(validTrade);
+        doNothing().when(tradeService).delete(any());
+        when(tradeService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/trade/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/trade/list"));
 
-        verify(tradeRepository).findById(1);
-        verify(tradeRepository).delete(any());
-        verify(tradeRepository).findAll();
+        verify(tradeService).findById(1);
+        verify(tradeService).delete(any());
+        verify(tradeService).findAll();
     }
 }

@@ -3,8 +3,8 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.UserController;
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.CustomUserDetailsService;
+import com.nnk.springboot.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,13 +14,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
@@ -44,10 +42,7 @@ public class UserControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private UserRepository userRepository;
-
-    @MockitoBean
-    private BCryptPasswordEncoder passwordEncoder;
+    private UserService userService;
 
     private User validUser;
 
@@ -73,7 +68,7 @@ public class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        when(userService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/user/list"))
                 .andDo(print())
@@ -81,7 +76,7 @@ public class UserControllerTest {
                 .andExpect(view().name("user/list"))
                 .andExpect(content().string(containsString("User List")));
 
-        verify(userRepository).findAll();
+        verify(userService).findAll();
     }
 
     @Test
@@ -99,9 +94,8 @@ public class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     public void postValidate_shouldSaveUser() throws Exception {
 
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userRepository.save(any())).thenReturn(validUser);
-        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        when(userService.save(any())).thenReturn(validUser);
+        when(userService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/user/validate")
                         .flashAttr("user", validUser)
@@ -110,9 +104,8 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/user/list"));
 
-        verify(passwordEncoder).encode(anyString());
-        verify(userRepository).save(any());
-        verify(userRepository).findAll();
+        verify(userService).save(any());
+        verify(userService).findAll();
     }
 
     @ParameterizedTest
@@ -160,7 +153,7 @@ public class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
+        when(userService.findById(anyInt())).thenReturn(validUser);
 
         this.mockMvc.perform(get("/user/update/{id}", 1))
                 .andDo(print())
@@ -168,16 +161,15 @@ public class UserControllerTest {
                 .andExpect(view().name("user/update"))
                 .andExpect(content().string(containsString("Update User")));
 
-        verify(userRepository).findById(1);
+        verify(userService).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     public void postUpdateUser_shouldSaveUser() throws Exception {
 
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userRepository.save(any())).thenReturn(validUser);
-        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        when(userService.save(any())).thenReturn(validUser);
+        when(userService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/user/update/{id}", 1)
                         .flashAttr("user", validUser)
@@ -186,9 +178,8 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/user/list"));
 
-        verify(passwordEncoder).encode(anyString());
-        verify(userRepository).save(any());
-        verify(userRepository).findAll();
+        verify(userService).save(any());
+        verify(userService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -210,17 +201,17 @@ public class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     public void getDeleteUser_shouldDeleteUser() throws Exception {
 
-        when(userRepository.findById(anyInt())).thenReturn(Optional.of(validUser));
-        doNothing().when(userRepository).delete(any(User.class));
-        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        when(userService.findById(anyInt())).thenReturn(validUser);
+        doNothing().when(userService).delete(any(User.class));
+        when(userService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/user/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/user/list"));
 
-        verify(userRepository).findById(1);
-        verify(userRepository).delete(any(User.class));
-        verify(userRepository).findAll();
+        verify(userService).findById(1);
+        verify(userService).delete(any(User.class));
+        verify(userService).findAll();
     }
 }

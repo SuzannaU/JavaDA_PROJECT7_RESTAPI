@@ -30,7 +30,8 @@ public class CurvePoint {
     @Column(name = "creationDate")
     private Timestamp creationDate;
 
-    public CurvePoint(double term, double value) {
+    public CurvePoint(int curveId, double term, double value) {
+        this.curveId = curveId;
         this.term = term;
         this.value = value;
     }

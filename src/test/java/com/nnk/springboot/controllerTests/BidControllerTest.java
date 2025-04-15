@@ -3,7 +3,7 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.BidController;
 import com.nnk.springboot.domain.Bid;
-import com.nnk.springboot.repositories.BidRepository;
+import com.nnk.springboot.services.BidService;
 import com.nnk.springboot.services.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
@@ -42,7 +41,7 @@ public class BidControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private BidRepository bidRepository;
+    private BidService bidService;
 
     private Bid validBid;
 
@@ -65,7 +64,7 @@ public class BidControllerTest {
     @WithMockUser(roles = "USER")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(bidRepository.findAll()).thenReturn(new ArrayList<>());
+        when(bidService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/bid/list"))
                 .andDo(print())
@@ -73,7 +72,7 @@ public class BidControllerTest {
                 .andExpect(view().name("bid/list"))
                 .andExpect(content().string(containsString("Bid List")));
 
-        verify(bidRepository).findAll();
+        verify(bidService).findAll();
     }
 
     @Test
@@ -91,8 +90,8 @@ public class BidControllerTest {
     @WithMockUser(roles = "USER")
     public void postValidate_shouldSaveBid() throws Exception {
 
-        when(bidRepository.save(any())).thenReturn(validBid);
-        when(bidRepository.findAll()).thenReturn(new ArrayList<>());
+        when(bidService.save(any())).thenReturn(validBid);
+        when(bidService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/bid/validate")
                         .flashAttr("bid", validBid)
@@ -101,8 +100,8 @@ public class BidControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/bid/list"));
 
-        verify(bidRepository).save(any());
-        verify(bidRepository).findAll();
+        verify(bidService).save(any());
+        verify(bidService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -124,7 +123,7 @@ public class BidControllerTest {
     @WithMockUser(roles = "USER")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(bidRepository.findById(anyInt())).thenReturn(Optional.of(validBid));
+        when(bidService.findById(anyInt())).thenReturn(validBid);
 
         this.mockMvc.perform(get("/bid/update/{id}", 1))
                 .andDo(print())
@@ -132,15 +131,15 @@ public class BidControllerTest {
                 .andExpect(view().name("bid/update"))
                 .andExpect(content().string(containsString("Update Bid")));
 
-        verify(bidRepository).findById(1);
+        verify(bidService).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void postUpdateBid_shouldSaveBid() throws Exception {
 
-        when(bidRepository.save(any())).thenReturn(validBid);
-        when(bidRepository.findAll()).thenReturn(new ArrayList<>());
+        when(bidService.save(any())).thenReturn(validBid);
+        when(bidService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/bid/update/{id}", 1)
                         .flashAttr("bid", validBid)
@@ -149,8 +148,8 @@ public class BidControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/bid/list"));
 
-        verify(bidRepository).save(any());
-        verify(bidRepository).findAll();
+        verify(bidService).save(any());
+        verify(bidService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -172,17 +171,17 @@ public class BidControllerTest {
     @WithMockUser(roles = "USER")
     public void getDeleteBid_shouldDeleteBid() throws Exception {
 
-        when(bidRepository.findById(anyInt())).thenReturn(Optional.of(validBid));
-        doNothing().when(bidRepository).delete(any());
-        when(bidRepository.findAll()).thenReturn(new ArrayList<>());
+        when(bidService.findById(anyInt())).thenReturn(validBid);
+        doNothing().when(bidService).delete(any());
+        when(bidService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/bid/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/bid/list"));
 
-        verify(bidRepository).findById(1);
-        verify(bidRepository).delete(any());
-        verify(bidRepository).findAll();
+        verify(bidService).findById(1);
+        verify(bidService).delete(any());
+        verify(bidService).findAll();
     }
 }

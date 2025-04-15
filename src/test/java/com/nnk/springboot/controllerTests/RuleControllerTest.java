@@ -3,8 +3,8 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.RuleController;
 import com.nnk.springboot.domain.Rule;
-import com.nnk.springboot.repositories.RuleRepository;
 import com.nnk.springboot.services.CustomUserDetailsService;
+import com.nnk.springboot.services.RuleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
@@ -42,7 +41,7 @@ public class RuleControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private RuleRepository ruleRepository;
+    private RuleService ruleService;
 
     private Rule validRule;
 
@@ -85,7 +84,7 @@ public class RuleControllerTest {
     @WithMockUser(roles = "USER")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/rule/list"))
                 .andDo(print())
@@ -93,7 +92,7 @@ public class RuleControllerTest {
                 .andExpect(view().name("rule/list"))
                 .andExpect(content().string(containsString("Rule List")));
 
-        verify(ruleRepository).findAll();
+        verify(ruleService).findAll();
     }
 
     @Test
@@ -111,8 +110,8 @@ public class RuleControllerTest {
     @WithMockUser(roles = "USER")
     public void postValidate_shouldSaveRule() throws Exception {
 
-        when(ruleRepository.save(any())).thenReturn(validRule);
-        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleService.save(any())).thenReturn(validRule);
+        when(ruleService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/rule/validate")
                         .flashAttr("rule", validRule)
@@ -121,8 +120,8 @@ public class RuleControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/rule/list"));
 
-        verify(ruleRepository).save(any());
-        verify(ruleRepository).findAll();
+        verify(ruleService).save(any());
+        verify(ruleService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -144,7 +143,7 @@ public class RuleControllerTest {
     @WithMockUser(roles = "USER")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(ruleRepository.findById(anyInt())).thenReturn(Optional.of(validRule));
+        when(ruleService.findById(anyInt())).thenReturn(validRule);
 
         this.mockMvc.perform(get("/rule/update/{id}", 1))
                 .andDo(print())
@@ -152,15 +151,15 @@ public class RuleControllerTest {
                 .andExpect(view().name("rule/update"))
                 .andExpect(content().string(containsString("Update Rule")));
 
-        verify(ruleRepository).findById(1);
+        verify(ruleService).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void postUpdateRule_shouldSaveRule() throws Exception {
 
-        when(ruleRepository.save(any())).thenReturn(validRule);
-        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleService.save(any())).thenReturn(validRule);
+        when(ruleService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/rule/update/{id}", 1)
                         .flashAttr("rule", validRule)
@@ -169,8 +168,8 @@ public class RuleControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/rule/list"));
 
-        verify(ruleRepository).save(any());
-        verify(ruleRepository).findAll();
+        verify(ruleService).save(any());
+        verify(ruleService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -192,17 +191,17 @@ public class RuleControllerTest {
     @WithMockUser(roles = "USER")
     public void getDeleteRule_shouldDeleteRule() throws Exception {
 
-        when(ruleRepository.findById(anyInt())).thenReturn(Optional.of(validRule));
-        doNothing().when(ruleRepository).delete(any());
-        when(ruleRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ruleService.findById(anyInt())).thenReturn(validRule);
+        doNothing().when(ruleService).delete(any());
+        when(ruleService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/rule/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/rule/list"));
 
-        verify(ruleRepository).findById(1);
-        verify(ruleRepository).delete(any());
-        verify(ruleRepository).findAll();
+        verify(ruleService).findById(1);
+        verify(ruleService).delete(any());
+        verify(ruleService).findAll();
     }
 }

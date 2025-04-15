@@ -3,8 +3,8 @@ package com.nnk.springboot.controllerTests;
 import com.nnk.springboot.config.SpringSecurityConfig;
 import com.nnk.springboot.controllers.RatingController;
 import com.nnk.springboot.domain.Rating;
-import com.nnk.springboot.repositories.RatingRepository;
 import com.nnk.springboot.services.CustomUserDetailsService;
+import com.nnk.springboot.services.RatingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,7 +42,7 @@ public class RatingControllerTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private RatingRepository ratingRepository;
+    private RatingService ratingService;
 
     private Rating validRating;
 
@@ -67,7 +67,7 @@ public class RatingControllerTest {
     @WithMockUser(roles = "USER")
     public void getHome_shouldReturnList() throws Exception {
 
-        when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ratingService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/rating/list"))
                 .andDo(print())
@@ -75,7 +75,7 @@ public class RatingControllerTest {
                 .andExpect(view().name("rating/list"))
                 .andExpect(content().string(containsString("Rating List")));
 
-        verify(ratingRepository).findAll();
+        verify(ratingService).findAll();
     }
 
     @Test
@@ -93,8 +93,8 @@ public class RatingControllerTest {
     @WithMockUser(roles = "USER")
     public void postValidate_shouldSaveRating() throws Exception {
 
-        when(ratingRepository.save(any())).thenReturn(validRating);
-        when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ratingService.save(any())).thenReturn(validRating);
+        when(ratingService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/rating/validate")
                         .flashAttr("rating", validRating)
@@ -103,8 +103,8 @@ public class RatingControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/rating/list"));
 
-        verify(ratingRepository).save(any());
-        verify(ratingRepository).findAll();
+        verify(ratingService).save(any());
+        verify(ratingService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -126,7 +126,7 @@ public class RatingControllerTest {
     @WithMockUser(roles = "USER")
     public void getShowUpdateForm_shouldReturnForm() throws Exception {
 
-        when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(validRating));
+        when(ratingService.findById(anyInt())).thenReturn(validRating);
 
         this.mockMvc.perform(get("/rating/update/{id}", 1))
                 .andDo(print())
@@ -134,15 +134,15 @@ public class RatingControllerTest {
                 .andExpect(view().name("rating/update"))
                 .andExpect(content().string(containsString("Update Rating")));
 
-        verify(ratingRepository).findById(1);
+        verify(ratingService).findById(1);
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void postUpdateRating_shouldSaveRating() throws Exception {
 
-        when(ratingRepository.save(any())).thenReturn(validRating);
-        when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ratingService.save(any())).thenReturn(validRating);
+        when(ratingService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/rating/update/{id}", 1)
                         .flashAttr("rating", validRating)
@@ -151,8 +151,8 @@ public class RatingControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/rating/list"));
 
-        verify(ratingRepository).save(any());
-        verify(ratingRepository).findAll();
+        verify(ratingService).save(any());
+        verify(ratingService).findAll();
     }
 
     @ParameterizedTest(name = "{0} should return {2} error")
@@ -174,17 +174,17 @@ public class RatingControllerTest {
     @WithMockUser(roles = "USER")
     public void getDeleteRating_shouldDeleteRating() throws Exception {
 
-        when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(validRating));
-        doNothing().when(ratingRepository).delete(any());
-        when(ratingRepository.findAll()).thenReturn(new ArrayList<>());
+        when(ratingService.findById(anyInt())).thenReturn(validRating);
+        doNothing().when(ratingService).delete(any());
+        when(ratingService.findAll()).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/rating/delete/{id}", 1))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/rating/list"));
 
-        verify(ratingRepository).findById(1);
-        verify(ratingRepository).delete(any());
-        verify(ratingRepository).findAll();
+        verify(ratingService).findById(1);
+        verify(ratingService).delete(any());
+        verify(ratingService).findAll();
     }
 }
