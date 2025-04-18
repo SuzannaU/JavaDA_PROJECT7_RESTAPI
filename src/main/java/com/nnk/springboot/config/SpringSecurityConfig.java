@@ -49,11 +49,11 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/user/**")
                             .hasRole("ADMIN");
                     auth.requestMatchers(
-                                    "/bidList/**",
+                                    "/bid/**",
                                     "/curvePoint/**",
                                     "/rating/**",
                                     "/trade/**",
-                                    "/ruleName/**")
+                                    "/rule/**")
                             .hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
                 })

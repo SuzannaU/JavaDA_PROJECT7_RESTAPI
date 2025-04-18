@@ -58,7 +58,6 @@ public class UserController {
         if (result.hasErrors()) {
             return "user/update";
         }
-        //user.setId(id);
         userService.save(user);
         model.addAttribute("users", userService.findAll());
         return "redirect:/user/list";
